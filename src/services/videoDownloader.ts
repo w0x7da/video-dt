@@ -1,5 +1,5 @@
-const API_KEY = "d2ad8e0252msh7b0aebd45f1f0a6p1d1f15jsn965159d7c789"; // Clé API gratuite partagée
-const BASE_URL = "https://social-media-video-downloader.p.rapidapi.com/api/getSocialVideo";
+const API_KEY = "d2ad8e0252msh7b0aebd45f1f0a6p1d1f15jsn965159d7c789";
+const BASE_URL = "https://social-media-video-downloader-api.p.rapidapi.com/v1/social/video";
 
 interface VideoInfo {
   title: string;
@@ -23,7 +23,7 @@ export const videoDownloader = {
         method: 'GET',
         headers: {
           'X-RapidAPI-Key': API_KEY,
-          'X-RapidAPI-Host': 'social-media-video-downloader.p.rapidapi.com'
+          'X-RapidAPI-Host': 'social-media-video-downloader-api.p.rapidapi.com'
         }
       });
       
@@ -46,10 +46,12 @@ export const videoDownloader = {
       else if (url.includes('twitter.com') || url.includes('x.com')) platform = 'Twitter';
       else if (url.includes('facebook.com') || url.includes('fb.watch')) platform = 'Facebook';
 
+      // Extraire les informations de la réponse
+      const videoData = data.data;
       return {
-        title: data.title || 'Vidéo sans titre',
-        thumbnail: data.thumbnail || data.cover || '',
-        duration: data.duration || '00:00',
+        title: videoData.title || 'Vidéo sans titre',
+        thumbnail: videoData.thumbnail || '',
+        duration: videoData.duration || '00:00',
         platform
       };
     } catch (error) {
@@ -65,7 +67,7 @@ export const videoDownloader = {
         method: 'GET',
         headers: {
           'X-RapidAPI-Key': API_KEY,
-          'X-RapidAPI-Host': 'social-media-video-downloader.p.rapidapi.com'
+          'X-RapidAPI-Host': 'social-media-video-downloader-api.p.rapidapi.com'
         }
       });
       
@@ -80,15 +82,16 @@ export const videoDownloader = {
       const data = await response.json();
       console.log('Download API Response:', data);
       
+      const videoData = data.data;
       let downloadUrl = '';
       
       // Chercher la meilleure qualité disponible
-      if (data.url) {
-        downloadUrl = data.url;
-      } else if (data.links && Array.isArray(data.links)) {
+      if (videoData.url) {
+        downloadUrl = videoData.url;
+      } else if (videoData.links && Array.isArray(videoData.links)) {
         const qualities = ['HD', 'high', 'medium', 'low'];
         for (const quality of qualities) {
-          const link = data.links.find((l: any) => 
+          const link = videoData.links.find((l: any) => 
             l.quality?.toLowerCase() === quality.toLowerCase()
           );
           if (link?.url) {
