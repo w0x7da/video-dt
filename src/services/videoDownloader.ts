@@ -37,7 +37,15 @@ export const videoDownloader = {
         throw new Error(data.error);
       }
 
-      // Convertir la durée en format lisible si nécessaire
+      // Détecter la plateforme à partir de l'URL
+      let platform = 'Inconnu';
+      if (url.includes('instagram.com')) platform = 'Instagram';
+      else if (url.includes('youtube.com') || url.includes('youtu.be')) platform = 'YouTube';
+      else if (url.includes('tiktok.com')) platform = 'TikTok';
+      else if (url.includes('twitter.com') || url.includes('x.com')) platform = 'Twitter';
+      else if (url.includes('facebook.com') || url.includes('fb.watch')) platform = 'Facebook';
+
+      // Convertir la durée en format lisible
       let duration = data.duration || data.Duration || '00:00';
       if (typeof duration === 'number') {
         const minutes = Math.floor(duration / 60000);
@@ -45,11 +53,15 @@ export const videoDownloader = {
         duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
       }
 
+      // Gérer les différents formats de réponse selon la plateforme
+      const title = data.title || data.Title || data.caption || data.description || 'Vidéo sans titre';
+      const thumbnail = data.thumbnail || data.Thumbnail || data.cover || data.thumbnail_url || '';
+
       return {
-        title: data.title || data.Title || 'Vidéo sans titre',
-        thumbnail: data.thumbnail || data.Thumbnail || '',
-        duration: duration,
-        platform: data.platform || data.Platform || 'Inconnu'
+        title,
+        thumbnail,
+        duration,
+        platform
       };
     } catch (error) {
       console.error('Error fetching video info:', error);
@@ -76,14 +88,14 @@ export const videoDownloader = {
       
       let downloadUrl = '';
       
-      // Chercher la meilleure qualité sans filigrane
+      // Chercher la meilleure qualité sans filigrane selon la plateforme
       if (data.medias && Array.isArray(data.medias)) {
-        // Priorité des qualités
-        const qualities = ['hd_no_watermark', 'no_watermark', 'watermark'];
+        const qualities = ['hd_no_watermark', 'no_watermark', 'hd', 'high', 'sd', 'watermark'];
         
         for (const quality of qualities) {
           const media = data.medias.find((m: Media) => 
-            m.quality === quality && m.type === 'video'
+            (m.quality === quality || m.quality?.toLowerCase().includes(quality)) && 
+            m.type === 'video'
           );
           if (media) {
             downloadUrl = media.url;
@@ -92,9 +104,15 @@ export const videoDownloader = {
         }
       }
 
-      // Fallback sur les anciens formats de réponse
+      // Fallback sur les différents formats de réponse selon la plateforme
       if (!downloadUrl) {
-        downloadUrl = data.downloadLink || data.DownloadLink || data.url || data.URL;
+        downloadUrl = data.downloadLink || 
+                     data.DownloadLink || 
+                     data.url || 
+                     data.URL ||
+                     data.hd_download_url ||
+                     data.download_url ||
+                     data.video_url;
       }
 
       if (!downloadUrl) {
@@ -108,7 +126,15 @@ export const videoDownloader = {
       // Créer un lien de téléchargement temporaire
       const downloadElement = document.createElement('a');
       downloadElement.href = URL.createObjectURL(blob);
-      downloadElement.download = `video_${Date.now()}.mp4`; // Nom du fichier par défaut
+      
+      // Générer un nom de fichier basé sur la plateforme
+      const platform = url.includes('instagram.com') ? 'instagram' :
+                      url.includes('youtube.com') || url.includes('youtu.be') ? 'youtube' :
+                      url.includes('tiktok.com') ? 'tiktok' :
+                      url.includes('twitter.com') || url.includes('x.com') ? 'twitter' :
+                      url.includes('facebook.com') || url.includes('fb.watch') ? 'facebook' : 'video';
+      
+      downloadElement.download = `${platform}_${Date.now()}.mp4`;
       
       // Déclencher le téléchargement
       document.body.appendChild(downloadElement);
