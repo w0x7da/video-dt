@@ -17,15 +17,10 @@ export const videoDownloader = {
       
       const response = await axios.post(BASE_URL, {
         url: url,
-        aFormat: "best",
-        filenamePattern: "basic",
-        dubLang: false,
-        vQuality: "best"
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
+        vQuality: "best",
+        isAudioOnly: false,
+        isAudioMuted: false,
+        dubLang: false
       });
 
       console.log('API Response:', response.data);
@@ -40,6 +35,7 @@ export const videoDownloader = {
 
       // Si la réponse contient une erreur
       if (response.data.error) {
+        console.error('API returned error:', response.data.error);
         throw new Error(response.data.error);
       }
 
@@ -61,28 +57,26 @@ export const videoDownloader = {
       
       const response = await axios.post(BASE_URL, {
         url: url,
-        aFormat: "best",
-        filenamePattern: "basic",
-        dubLang: false,
-        vQuality: "best"
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
+        vQuality: "best",
+        isAudioOnly: false,
+        isAudioMuted: false,
+        dubLang: false
       });
       
       console.log('Download API Response:', response.data);
 
       if (response.data.error) {
+        console.error('API returned error:', response.data.error);
         throw new Error(response.data.error);
       }
 
       if (!response.data.url) {
+        console.error('No download URL available');
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
       // Télécharger la vidéo
+      console.log('Opening download URL:', response.data.url);
       window.open(response.data.url, '_blank');
       
     } catch (error) {
