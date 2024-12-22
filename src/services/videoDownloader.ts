@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Utilisation de l'API publique de cobalt
+// Utilisation de l'API publique de cobalt avec CORS
 const BASE_URL = "https://co.wuk.sh/api/json";
 
 interface VideoInfo {
@@ -17,10 +17,17 @@ export const videoDownloader = {
       
       const response = await axios.post(BASE_URL, {
         url: url,
-        vQuality: "best",
+        vQuality: "1080",
         isAudioOnly: false,
         isAudioMuted: false,
         dubLang: false
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Origin': window.location.origin
+        },
+        timeout: 10000 // 10 secondes timeout
       });
 
       console.log('API Response:', response.data);
@@ -57,10 +64,17 @@ export const videoDownloader = {
       
       const response = await axios.post(BASE_URL, {
         url: url,
-        vQuality: "best",
+        vQuality: "1080",
         isAudioOnly: false,
         isAudioMuted: false,
         dubLang: false
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Origin': window.location.origin
+        },
+        timeout: 10000 // 10 secondes timeout
       });
       
       console.log('Download API Response:', response.data);
