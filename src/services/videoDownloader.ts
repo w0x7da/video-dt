@@ -1,6 +1,7 @@
 import { instagramApi } from './apis/instagramApi';
 import { universalApi } from './apis/universalApi';
 import { grabberApi } from './apis/grabberApi';
+import { videoApi } from './apis/videoApi';
 import { detectPlatform } from './utils/platformDetector';
 import { createDownloadLink, findBestQualityUrl } from './utils/downloadHelper';
 
@@ -25,8 +26,13 @@ export const videoDownloader = {
         try {
           data = await universalApi.fetchContent(url);
         } catch (error) {
-          console.log('Universal API failed, trying Grabber API');
-          data = await grabberApi.fetchContent(url);
+          console.log('Universal API failed, trying Video API');
+          try {
+            data = await videoApi.fetchContent(url);
+          } catch (videoError) {
+            console.log('Video API failed, trying Grabber API');
+            data = await grabberApi.fetchContent(url);
+          }
         }
       }
 
@@ -69,8 +75,13 @@ export const videoDownloader = {
         try {
           data = await universalApi.fetchContent(url);
         } catch (error) {
-          console.log('Universal API failed, trying Grabber API');
-          data = await grabberApi.fetchContent(url);
+          console.log('Universal API failed, trying Video API');
+          try {
+            data = await videoApi.fetchContent(url);
+          } catch (videoError) {
+            console.log('Video API failed, trying Grabber API');
+            data = await grabberApi.fetchContent(url);
+          }
         }
       }
 
