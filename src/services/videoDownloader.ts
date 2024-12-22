@@ -1,5 +1,7 @@
-const API_KEY = "d2ad8e0252msh7b0aebd45f1f0a6p1d1f15jsn965159d7c789";
-const BASE_URL = "https://social-media-video-downloader-api.p.rapidapi.com/v1/social/video";
+import axios from 'axios';
+
+// Utilisation de l'API publique de yt-dlp
+const BASE_URL = "https://co.wuk.sh/api/json";
 
 interface VideoInfo {
   title: string;
@@ -8,35 +10,20 @@ interface VideoInfo {
   platform: string;
 }
 
-interface Media {
-  url: string;
-  quality: string;
-  extension: string;
-  type: string;
-}
-
 export const videoDownloader = {
   async getVideoInfo(url: string): Promise<VideoInfo> {
     try {
       console.log('Fetching video info for URL:', url);
-      const response = await fetch(`${BASE_URL}?url=${encodeURIComponent(url)}`, {
-        method: 'GET',
-        headers: {
-          'X-RapidAPI-Key': API_KEY,
-          'X-RapidAPI-Host': 'social-media-video-downloader-api.p.rapidapi.com'
-        }
+      
+      const response = await axios.post(BASE_URL, {
+        url: url,
+        aFormat: "mp3",
+        filenamePattern: "basic",
+        dubLang: false,
+        vQuality: "1080"
       });
-      
-      if (!response.ok) {
-        console.error('API Response status:', response.status);
-        console.error('API Response status text:', response.statusText);
-        const errorText = await response.text();
-        console.error('API Error response:', errorText);
-        throw new Error(`Erreur API: ${response.status} - ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      console.log('API Response data:', data);
+
+      console.log('API Response:', response.data);
 
       // Détecter la plateforme à partir de l'URL
       let platform = 'Inconnu';
@@ -46,12 +33,10 @@ export const videoDownloader = {
       else if (url.includes('twitter.com') || url.includes('x.com')) platform = 'Twitter';
       else if (url.includes('facebook.com') || url.includes('fb.watch')) platform = 'Facebook';
 
-      // Extraire les informations de la réponse
-      const videoData = data.data;
       return {
-        title: videoData.title || 'Vidéo sans titre',
-        thumbnail: videoData.thumbnail || '',
-        duration: videoData.duration || '00:00',
+        title: response.data.meta?.title || 'Vidéo sans titre',
+        thumbnail: response.data.thumb || '',
+        duration: response.data.meta?.duration || '00:00',
         platform
       };
     } catch (error) {
@@ -63,55 +48,28 @@ export const videoDownloader = {
   async downloadVideo(url: string): Promise<void> {
     try {
       console.log('Starting video download for URL:', url);
-      const response = await fetch(`${BASE_URL}?url=${encodeURIComponent(url)}`, {
-        method: 'GET',
-        headers: {
-          'X-RapidAPI-Key': API_KEY,
-          'X-RapidAPI-Host': 'social-media-video-downloader-api.p.rapidapi.com'
-        }
+      
+      const response = await axios.post(BASE_URL, {
+        url: url,
+        aFormat: "mp4",
+        filenamePattern: "basic",
+        dubLang: false,
+        vQuality: "1080"
       });
       
-      if (!response.ok) {
-        console.error('Download API Response status:', response.status);
-        console.error('Download API Response status text:', response.statusText);
-        const errorText = await response.text();
-        console.error('Download API Error response:', errorText);
-        throw new Error(`Erreur API: ${response.status} - ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      console.log('Download API Response:', data);
-      
-      const videoData = data.data;
-      let downloadUrl = '';
-      
-      // Chercher la meilleure qualité disponible
-      if (videoData.url) {
-        downloadUrl = videoData.url;
-      } else if (videoData.links && Array.isArray(videoData.links)) {
-        const qualities = ['HD', 'high', 'medium', 'low'];
-        for (const quality of qualities) {
-          const link = videoData.links.find((l: any) => 
-            l.quality?.toLowerCase() === quality.toLowerCase()
-          );
-          if (link?.url) {
-            downloadUrl = link.url;
-            break;
-          }
-        }
-      }
+      console.log('Download API Response:', response.data);
 
-      if (!downloadUrl) {
+      if (!response.data.url) {
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
-      console.log('Download URL:', downloadUrl);
-
       // Télécharger la vidéo
-      const videoResponse = await fetch(downloadUrl);
-      const blob = await videoResponse.blob();
+      const videoResponse = await axios.get(response.data.url, {
+        responseType: 'blob'
+      });
       
       // Créer un lien de téléchargement temporaire
+      const blob = new Blob([videoResponse.data], { type: 'video/mp4' });
       const downloadElement = document.createElement('a');
       downloadElement.href = URL.createObjectURL(blob);
       
