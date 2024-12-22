@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Configuration de l'API yt-dlp
-const BASE_URL = "https://co.wuk.sh/api/json"; // API gratuite et open source
+// Configuration de l'API
+const BASE_URL = "https://api.savetube.me/api/json"; // API alternative plus stable
 
 interface VideoInfo {
   title: string;
@@ -20,13 +20,13 @@ export const videoDownloader = {
         vQuality: "1080",
         isAudioOnly: false,
         isAudioMuted: false,
-        dubLang: false
       }, {
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Origin': window.location.origin
         },
-        timeout: 30000 // 30 secondes timeout
+        timeout: 10000 // Réduit à 10 secondes pour une meilleure expérience utilisateur
       });
 
       console.log('API Response:', response.data);
@@ -66,13 +66,13 @@ export const videoDownloader = {
         vQuality: "1080",
         isAudioOnly: false,
         isAudioMuted: false,
-        dubLang: false
       }, {
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Origin': window.location.origin
         },
-        timeout: 30000 // 30 secondes timeout
+        timeout: 10000
       });
       
       console.log('Download API Response:', response.data);
