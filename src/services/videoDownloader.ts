@@ -1,6 +1,8 @@
-const API_KEY = "6079|kQr3TNBAD4pT2xWNP1TBP0pNZVbM3zzeSmEw3YtN";
-const BASE_URL_INSTAGRAM = "https://zylalabs.com/api/2883/instagram+photo+and+video+saver+api/3005";
-const BASE_URL_UNIVERSAL = "https://zylalabs.com/api/5393/universal+social+downloader+api/6986";
+import { instagramApi } from './apis/instagramApi';
+import { universalApi } from './apis/universalApi';
+import { grabberApi } from './apis/grabberApi';
+import { detectPlatform } from './utils/platformDetector';
+import { createDownloadLink, findBestQualityUrl } from './utils/downloadHelper';
 
 interface VideoInfo {
   title: string;
@@ -9,46 +11,25 @@ interface VideoInfo {
   platform: string;
 }
 
-interface Media {
-  url: string;
-  quality: string;
-  extension: string;
-  type: string;
-}
-
 export const videoDownloader = {
   async getVideoInfo(url: string): Promise<VideoInfo> {
     try {
-      let apiUrl;
-      let method = 'GET';
-      const headers = {
-        'Authorization': `Bearer ${API_KEY}`,
-        'Accept': 'application/json'
-      };
+      console.log('Fetching video info for URL:', url);
       
-      // Déterminer quelle API utiliser en fonction de l'URL
-      if (url.includes('instagram.com')) {
-        apiUrl = `${BASE_URL_INSTAGRAM}/content+downloader?url=${encodeURIComponent(url)}`;
+      let data;
+      const platform = detectPlatform(url);
+      
+      if (platform === 'Instagram') {
+        data = await instagramApi.fetchContent(url);
       } else {
-        apiUrl = `${BASE_URL_UNIVERSAL}/download+social+media+content`;
-        method = 'POST';
+        try {
+          data = await universalApi.fetchContent(url);
+        } catch (error) {
+          console.log('Universal API failed, trying Grabber API');
+          data = await grabberApi.fetchContent(url);
+        }
       }
 
-      console.log('Requesting API:', { url: apiUrl, method });
-
-      const response = await fetch(apiUrl, {
-        method,
-        headers,
-        body: method === 'POST' ? JSON.stringify({ url }) : undefined
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('API Error Response:', errorText);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
       console.log('API Response:', data);
 
       if (data.error) {
@@ -56,15 +37,6 @@ export const videoDownloader = {
         throw new Error(data.error);
       }
 
-      // Détecter la plateforme à partir de l'URL
-      let platform = 'Inconnu';
-      if (url.includes('instagram.com')) platform = 'Instagram';
-      else if (url.includes('youtube.com') || url.includes('youtu.be')) platform = 'YouTube';
-      else if (url.includes('tiktok.com')) platform = 'TikTok';
-      else if (url.includes('twitter.com') || url.includes('x.com')) platform = 'Twitter';
-      else if (url.includes('facebook.com') || url.includes('fb.watch')) platform = 'Facebook';
-
-      // Convertir la durée en format lisible
       let duration = data.duration || data.Duration || '00:00';
       if (typeof duration === 'number') {
         const minutes = Math.floor(duration / 60000);
@@ -72,13 +44,9 @@ export const videoDownloader = {
         duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
       }
 
-      // Gérer les différents formats de réponse selon la plateforme
-      const title = data.title || data.Title || data.caption || data.description || 'Vidéo sans titre';
-      const thumbnail = data.thumbnail || data.Thumbnail || data.cover || data.thumbnail_url || '';
-
       return {
-        title,
-        thumbnail,
+        title: data.title || data.Title || data.caption || data.description || 'Vidéo sans titre',
+        thumbnail: data.thumbnail || data.Thumbnail || data.cover || data.thumbnail_url || '',
         duration,
         platform
       };
@@ -90,36 +58,22 @@ export const videoDownloader = {
 
   async downloadVideo(url: string): Promise<void> {
     try {
-      let apiUrl;
-      let method = 'GET';
-      const headers = {
-        'Authorization': `Bearer ${API_KEY}`,
-        'Accept': 'application/json'
-      };
+      console.log('Starting video download for URL:', url);
       
-      // Déterminer quelle API utiliser en fonction de l'URL
-      if (url.includes('instagram.com')) {
-        apiUrl = `${BASE_URL_INSTAGRAM}/content+downloader?url=${encodeURIComponent(url)}`;
+      let data;
+      const platform = detectPlatform(url);
+      
+      if (platform === 'Instagram') {
+        data = await instagramApi.fetchContent(url);
       } else {
-        apiUrl = `${BASE_URL_UNIVERSAL}/download+social+media+content`;
-        method = 'POST';
+        try {
+          data = await universalApi.fetchContent(url);
+        } catch (error) {
+          console.log('Universal API failed, trying Grabber API');
+          data = await grabberApi.fetchContent(url);
+        }
       }
 
-      console.log('Downloading from API:', { url: apiUrl, method });
-
-      const response = await fetch(apiUrl, {
-        method,
-        headers,
-        body: method === 'POST' ? JSON.stringify({ url }) : undefined
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('API Error Response:', errorText);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
       console.log('Download Response:', data);
       
       if (data.error) {
@@ -127,42 +81,13 @@ export const videoDownloader = {
         throw new Error(data.error);
       }
 
-      let downloadUrl = '';
-      
-      // Chercher la meilleure qualité disponible
-      if (data.medias && Array.isArray(data.medias)) {
-        const qualities = ['hd_no_watermark', 'no_watermark', 'hd', 'high', 'sd'];
-        
-        for (const quality of qualities) {
-          const media = data.medias.find((m: Media) => 
-            (m.quality === quality || m.quality?.toLowerCase().includes(quality)) && 
-            m.type === 'video'
-          );
-          if (media) {
-            downloadUrl = media.url;
-            break;
-          }
-        }
-      }
-
-      // Fallback sur les différents formats de réponse selon la plateforme
-      if (!downloadUrl) {
-        downloadUrl = data.downloadLink || 
-                     data.DownloadLink || 
-                     data.url || 
-                     data.URL ||
-                     data.hd_download_url ||
-                     data.download_url ||
-                     data.video_url;
-      }
-
+      const downloadUrl = findBestQualityUrl(data);
       if (!downloadUrl) {
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
       console.log('Starting download from URL:', downloadUrl);
 
-      // Télécharger la vidéo
       const videoResponse = await fetch(downloadUrl);
       if (!videoResponse.ok) {
         throw new Error(`Erreur lors du téléchargement de la vidéo: ${videoResponse.status}`);
@@ -173,26 +98,15 @@ export const videoDownloader = {
         throw new Error('Le fichier téléchargé est vide');
       }
       
-      // Créer un lien de téléchargement temporaire
+      const downloadUrl2 = createDownloadLink(blob, platform);
       const downloadElement = document.createElement('a');
-      downloadElement.href = URL.createObjectURL(blob);
+      downloadElement.href = downloadUrl2;
       
-      // Générer un nom de fichier basé sur la plateforme
-      const platform = url.includes('instagram.com') ? 'instagram' :
-                      url.includes('youtube.com') || url.includes('youtu.be') ? 'youtube' :
-                      url.includes('tiktok.com') ? 'tiktok' :
-                      url.includes('twitter.com') || url.includes('x.com') ? 'twitter' :
-                      url.includes('facebook.com') || url.includes('fb.watch') ? 'facebook' : 'video';
-      
-      downloadElement.download = `${platform}_${Date.now()}.mp4`;
-      
-      // Déclencher le téléchargement
       document.body.appendChild(downloadElement);
       downloadElement.click();
       document.body.removeChild(downloadElement);
       
-      // Nettoyer l'URL temporaire
-      URL.revokeObjectURL(downloadElement.href);
+      URL.revokeObjectURL(downloadUrl2);
 
       console.log('Download completed successfully');
     } catch (error) {
