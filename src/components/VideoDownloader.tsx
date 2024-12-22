@@ -44,7 +44,11 @@ export const VideoDownloader = () => {
     }
   };
 
-  const handleDownload = async () => {
+  const handleDownload = async (event: React.MouseEvent) => {
+    event.preventDefault(); // Empêcher le comportement par défaut
+    
+    if (loading) return; // Éviter les doubles clics pendant le chargement
+    
     setLoading(true);
     try {
       await videoDownloader.downloadVideo(url);
@@ -53,6 +57,7 @@ export const VideoDownloader = () => {
         description: "Téléchargement démarré",
       });
     } catch (error) {
+      console.error('Erreur de téléchargement:', error);
       toast({
         title: "Erreur",
         description: "Impossible de télécharger la vidéo",
