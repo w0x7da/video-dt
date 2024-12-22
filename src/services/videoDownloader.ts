@@ -99,7 +99,10 @@ export const videoDownloader = {
 
       console.log('Starting download from URL:', downloadUrl);
 
-      const videoResponse = await fetch(downloadUrl);
+      // Utiliser un proxy CORS pour le téléchargement
+      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(downloadUrl)}`;
+      const videoResponse = await fetch(proxyUrl);
+      
       if (!videoResponse.ok) {
         throw new Error(`Erreur lors du téléchargement de la vidéo: ${videoResponse.status}`);
       }
