@@ -71,7 +71,7 @@ export const VideoDownloader = () => {
             Téléchargeur de Vidéos
           </h1>
           <p className="text-muted-foreground">
-            Téléchargez des vidéos depuis n'importe quelle plateforme
+            Téléchargez des vidéos TikTok et instagram
           </p>
         </div>
 
