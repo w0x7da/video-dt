@@ -1,5 +1,5 @@
-const API_KEY = "6079|kQr3TNBAD4pT2xWNP1TBP0pNZVbM3zzeSmEw3YtN";
-const BASE_URL = "https://zylalabs.com/api/5617/social+saver+api/7304";
+const API_KEY = "d2ad8e0252msh7b0aebd45f1f0a6p1d1f15jsn965159d7c789"; // Clé API gratuite partagée
+const BASE_URL = "https://social-media-video-downloader.p.rapidapi.com/api/getSocialVideo";
 
 interface VideoInfo {
   title: string;
@@ -19,11 +19,11 @@ export const videoDownloader = {
   async getVideoInfo(url: string): Promise<VideoInfo> {
     try {
       console.log('Fetching video info for URL:', url);
-      const response = await fetch(`${BASE_URL}/download+video?url=${encodeURIComponent(url)}`, {
+      const response = await fetch(`${BASE_URL}?url=${encodeURIComponent(url)}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${API_KEY}`,
-          'Accept': 'application/json'
+          'X-RapidAPI-Key': API_KEY,
+          'X-RapidAPI-Host': 'social-media-video-downloader.p.rapidapi.com'
         }
       });
       
@@ -38,11 +38,6 @@ export const videoDownloader = {
       const data = await response.json();
       console.log('API Response data:', data);
 
-      if (data.error) {
-        console.error('API returned error:', data.error);
-        throw new Error(data.error);
-      }
-
       // Détecter la plateforme à partir de l'URL
       let platform = 'Inconnu';
       if (url.includes('instagram.com')) platform = 'Instagram';
@@ -51,22 +46,10 @@ export const videoDownloader = {
       else if (url.includes('twitter.com') || url.includes('x.com')) platform = 'Twitter';
       else if (url.includes('facebook.com') || url.includes('fb.watch')) platform = 'Facebook';
 
-      // Convertir la durée en format lisible
-      let duration = data.duration || data.Duration || '00:00';
-      if (typeof duration === 'number') {
-        const minutes = Math.floor(duration / 60000);
-        const seconds = Math.floor((duration % 60000) / 1000);
-        duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-      }
-
-      // Gérer les différents formats de réponse selon la plateforme
-      const title = data.title || data.Title || data.caption || data.description || 'Vidéo sans titre';
-      const thumbnail = data.thumbnail || data.Thumbnail || data.cover || data.thumbnail_url || '';
-
       return {
-        title,
-        thumbnail,
-        duration,
+        title: data.title || 'Vidéo sans titre',
+        thumbnail: data.thumbnail || data.cover || '',
+        duration: data.duration || '00:00',
         platform
       };
     } catch (error) {
@@ -78,11 +61,11 @@ export const videoDownloader = {
   async downloadVideo(url: string): Promise<void> {
     try {
       console.log('Starting video download for URL:', url);
-      const response = await fetch(`${BASE_URL}/download+video?url=${encodeURIComponent(url)}`, {
+      const response = await fetch(`${BASE_URL}?url=${encodeURIComponent(url)}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${API_KEY}`,
-          'Accept': 'application/json'
+          'X-RapidAPI-Key': API_KEY,
+          'X-RapidAPI-Host': 'social-media-video-downloader.p.rapidapi.com'
         }
       });
       
@@ -99,31 +82,20 @@ export const videoDownloader = {
       
       let downloadUrl = '';
       
-      // Chercher la meilleure qualité sans filigrane selon la plateforme
-      if (data.medias && Array.isArray(data.medias)) {
-        const qualities = ['hd_no_watermark', 'no_watermark', 'hd', 'high', 'sd', 'watermark'];
-        
+      // Chercher la meilleure qualité disponible
+      if (data.url) {
+        downloadUrl = data.url;
+      } else if (data.links && Array.isArray(data.links)) {
+        const qualities = ['HD', 'high', 'medium', 'low'];
         for (const quality of qualities) {
-          const media = data.medias.find((m: Media) => 
-            (m.quality === quality || m.quality?.toLowerCase().includes(quality)) && 
-            m.type === 'video'
+          const link = data.links.find((l: any) => 
+            l.quality?.toLowerCase() === quality.toLowerCase()
           );
-          if (media) {
-            downloadUrl = media.url;
+          if (link?.url) {
+            downloadUrl = link.url;
             break;
           }
         }
-      }
-
-      // Fallback sur les différents formats de réponse selon la plateforme
-      if (!downloadUrl) {
-        downloadUrl = data.downloadLink || 
-                     data.DownloadLink || 
-                     data.url || 
-                     data.URL ||
-                     data.hd_download_url ||
-                     data.download_url ||
-                     data.video_url;
       }
 
       if (!downloadUrl) {
