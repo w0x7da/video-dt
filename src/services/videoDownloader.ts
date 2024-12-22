@@ -1,5 +1,6 @@
 const API_KEY = "6079|kQr3TNBAD4pT2xWNP1TBP0pNZVbM3zzeSmEw3YtN";
-const BASE_URL = "https://zylalabs.com/api/5617/social+saver+api/7304";
+const BASE_URL_INSTAGRAM = "https://zylalabs.com/api/2883/instagram+photo+and+video+saver+api/3005";
+const BASE_URL_UNIVERSAL = "https://zylalabs.com/api/5393/universal+social+downloader+api/6986";
 
 interface VideoInfo {
   title: string;
@@ -18,12 +19,25 @@ interface Media {
 export const videoDownloader = {
   async getVideoInfo(url: string): Promise<VideoInfo> {
     try {
-      const response = await fetch(`${BASE_URL}/download+video?url=${encodeURIComponent(url)}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${API_KEY}`,
-          'Accept': 'application/json'
-        }
+      let apiUrl;
+      let method = 'GET';
+      const headers = {
+        'Authorization': `Bearer ${API_KEY}`,
+        'Accept': 'application/json'
+      };
+      
+      // Déterminer quelle API utiliser en fonction de l'URL
+      if (url.includes('instagram.com')) {
+        apiUrl = `${BASE_URL_INSTAGRAM}/content+downloader?url=${encodeURIComponent(url)}`;
+      } else {
+        apiUrl = `${BASE_URL_UNIVERSAL}/download+social+media+content`;
+        method = 'POST';
+      }
+
+      const response = await fetch(apiUrl, {
+        method,
+        headers,
+        body: method === 'POST' ? JSON.stringify({ url }) : undefined
       });
       
       if (!response.ok) {
@@ -71,12 +85,25 @@ export const videoDownloader = {
 
   async downloadVideo(url: string): Promise<void> {
     try {
-      const response = await fetch(`${BASE_URL}/download+video?url=${encodeURIComponent(url)}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${API_KEY}`,
-          'Accept': 'application/json'
-        }
+      let apiUrl;
+      let method = 'GET';
+      const headers = {
+        'Authorization': `Bearer ${API_KEY}`,
+        'Accept': 'application/json'
+      };
+      
+      // Déterminer quelle API utiliser en fonction de l'URL
+      if (url.includes('instagram.com')) {
+        apiUrl = `${BASE_URL_INSTAGRAM}/content+downloader?url=${encodeURIComponent(url)}`;
+      } else {
+        apiUrl = `${BASE_URL_UNIVERSAL}/download+social+media+content`;
+        method = 'POST';
+      }
+
+      const response = await fetch(apiUrl, {
+        method,
+        headers,
+        body: method === 'POST' ? JSON.stringify({ url }) : undefined
       });
       
       if (!response.ok) {
