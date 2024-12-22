@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Configuration de l'API
-const BASE_URL = "https://api.savetube.me/api/json"; // API alternative plus stable
+const BASE_URL = "https://ssyoutube.com/api/convert"; // API plus stable et rapide
 
 interface VideoInfo {
   title: string;
@@ -15,18 +15,15 @@ export const videoDownloader = {
     try {
       console.log('Fetching video info for URL:', url);
       
-      const response = await axios.post(BASE_URL, {
-        url: url,
-        vQuality: "1080",
-        isAudioOnly: false,
-        isAudioMuted: false,
-      }, {
+      const response = await axios.get(`${BASE_URL}`, {
+        params: {
+          url: url
+        },
         headers: {
-          'Content-Type': 'application/json',
           'Accept': 'application/json',
           'Origin': window.location.origin
         },
-        timeout: 10000 // Réduit à 10 secondes pour une meilleure expérience utilisateur
+        timeout: 15000 // 15 secondes timeout
       });
 
       console.log('API Response:', response.data);
@@ -45,10 +42,11 @@ export const videoDownloader = {
         throw new Error(response.data.error);
       }
 
+      const videoData = response.data;
       return {
-        title: response.data.meta?.title || 'Vidéo sans titre',
-        thumbnail: response.data.thumb || '',
-        duration: response.data.meta?.duration || '00:00',
+        title: videoData.meta?.title || 'Vidéo sans titre',
+        thumbnail: videoData.thumb || videoData.thumbnail || '',
+        duration: videoData.meta?.duration || '00:00',
         platform
       };
     } catch (error) {
@@ -61,18 +59,15 @@ export const videoDownloader = {
     try {
       console.log('Starting video download for URL:', url);
       
-      const response = await axios.post(BASE_URL, {
-        url: url,
-        vQuality: "1080",
-        isAudioOnly: false,
-        isAudioMuted: false,
-      }, {
+      const response = await axios.get(`${BASE_URL}`, {
+        params: {
+          url: url
+        },
         headers: {
-          'Content-Type': 'application/json',
           'Accept': 'application/json',
           'Origin': window.location.origin
         },
-        timeout: 10000
+        timeout: 15000
       });
       
       console.log('Download API Response:', response.data);
@@ -82,14 +77,15 @@ export const videoDownloader = {
         throw new Error(response.data.error);
       }
 
-      if (!response.data.url) {
+      const downloadUrl = response.data.url || response.data.download_url;
+      if (!downloadUrl) {
         console.error('No download URL available');
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
       // Télécharger la vidéo
-      console.log('Opening download URL:', response.data.url);
-      window.open(response.data.url, '_blank');
+      console.log('Opening download URL:', downloadUrl);
+      window.open(downloadUrl, '_blank');
       
     } catch (error) {
       console.error('Error downloading video:', error);
