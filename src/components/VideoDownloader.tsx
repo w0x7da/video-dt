@@ -64,19 +64,19 @@ export const VideoDownloader = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 animate-fade-in">
-      <div className="w-full max-w-xl space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold tracking-tight">
+    <div className="min-h-[100dvh] flex flex-col items-center justify-center p-4 animate-fade-in">
+      <div className="w-full max-w-xl space-y-6 px-4 sm:px-0">
+        <div className="text-center space-y-3">
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
             Téléchargeur de Vidéos
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-sm sm:text-base">
             Téléchargez des vidéos TikTok et instagram
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Input
               type="url"
               placeholder="Collez l'URL de la vidéo ici"
@@ -87,7 +87,7 @@ export const VideoDownloader = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="h-12 px-6 bg-black text-white hover:bg-gray-800 transition-colors duration-200"
+              className="h-12 px-6 bg-black text-white hover:bg-gray-800 transition-colors duration-200 whitespace-nowrap"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Vérifier"}
             </Button>
@@ -95,7 +95,7 @@ export const VideoDownloader = () => {
         </form>
 
         {videoInfo && (
-          <div className="bg-secondary p-6 rounded-lg space-y-4 animate-fade-in">
+          <div className="bg-secondary p-4 sm:p-6 rounded-lg space-y-4 animate-fade-in">
             <div className="aspect-video relative overflow-hidden rounded-lg">
               <img
                 src={videoInfo.thumbnail}
@@ -104,8 +104,8 @@ export const VideoDownloader = () => {
               />
             </div>
             <div className="space-y-2">
-              <h2 className="text-xl font-semibold">{videoInfo.title}</h2>
-              <div className="flex justify-between text-sm text-muted-foreground">
+              <h2 className="text-lg sm:text-xl font-semibold line-clamp-2">{videoInfo.title}</h2>
+              <div className="flex flex-col sm:flex-row sm:justify-between text-sm text-muted-foreground gap-1">
                 <span>Durée: {videoInfo.duration}</span>
                 <span>Plateforme: {videoInfo.platform}</span>
               </div>
