@@ -34,6 +34,8 @@ export const videoDownloader = {
         method = 'POST';
       }
 
+      console.log('Requesting API:', { url: apiUrl, method });
+
       const response = await fetch(apiUrl, {
         method,
         headers,
@@ -41,6 +43,8 @@ export const videoDownloader = {
       });
       
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
@@ -48,6 +52,7 @@ export const videoDownloader = {
       console.log('API Response:', data);
 
       if (data.error) {
+        console.error('API Error:', data.error);
         throw new Error(data.error);
       }
 
@@ -100,6 +105,8 @@ export const videoDownloader = {
         method = 'POST';
       }
 
+      console.log('Downloading from API:', { url: apiUrl, method });
+
       const response = await fetch(apiUrl, {
         method,
         headers,
@@ -107,17 +114,24 @@ export const videoDownloader = {
       });
       
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const data = await response.json();
       console.log('Download Response:', data);
       
+      if (data.error) {
+        console.error('API Error:', data.error);
+        throw new Error(data.error);
+      }
+
       let downloadUrl = '';
       
-      // Chercher la meilleure qualité sans filigrane selon la plateforme
+      // Chercher la meilleure qualité disponible
       if (data.medias && Array.isArray(data.medias)) {
-        const qualities = ['hd_no_watermark', 'no_watermark', 'hd', 'high', 'sd', 'watermark'];
+        const qualities = ['hd_no_watermark', 'no_watermark', 'hd', 'high', 'sd'];
         
         for (const quality of qualities) {
           const media = data.medias.find((m: Media) => 
@@ -146,9 +160,18 @@ export const videoDownloader = {
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
+      console.log('Starting download from URL:', downloadUrl);
+
       // Télécharger la vidéo
       const videoResponse = await fetch(downloadUrl);
+      if (!videoResponse.ok) {
+        throw new Error(`Erreur lors du téléchargement de la vidéo: ${videoResponse.status}`);
+      }
+
       const blob = await videoResponse.blob();
+      if (blob.size === 0) {
+        throw new Error('Le fichier téléchargé est vide');
+      }
       
       // Créer un lien de téléchargement temporaire
       const downloadElement = document.createElement('a');
@@ -170,6 +193,8 @@ export const videoDownloader = {
       
       // Nettoyer l'URL temporaire
       URL.revokeObjectURL(downloadElement.href);
+
+      console.log('Download completed successfully');
     } catch (error) {
       console.error('Error downloading video:', error);
       throw error;
