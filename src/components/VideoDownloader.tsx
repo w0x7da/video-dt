@@ -47,8 +47,7 @@ export const VideoDownloader = () => {
   const handleDownload = async () => {
     setLoading(true);
     try {
-      const downloadUrl = await videoDownloader.downloadVideo(url);
-      window.open(downloadUrl, '_blank');
+      await videoDownloader.downloadVideo(url);
       toast({
         title: "Succès",
         description: "Téléchargement démarré",

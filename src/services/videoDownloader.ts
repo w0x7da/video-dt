@@ -57,7 +57,7 @@ export const videoDownloader = {
     }
   },
 
-  async downloadVideo(url: string): Promise<string> {
+  async downloadVideo(url: string): Promise<void> {
     try {
       const response = await fetch(`${BASE_URL}/download+video?url=${encodeURIComponent(url)}`, {
         method: 'GET',
@@ -74,6 +74,8 @@ export const videoDownloader = {
       const data = await response.json();
       console.log('Download Response:', data);
       
+      let downloadUrl = '';
+      
       // Chercher la meilleure qualité sans filigrane
       if (data.medias && Array.isArray(data.medias)) {
         // Priorité des qualités
@@ -84,18 +86,37 @@ export const videoDownloader = {
             m.quality === quality && m.type === 'video'
           );
           if (media) {
-            return media.url;
+            downloadUrl = media.url;
+            break;
           }
         }
       }
 
       // Fallback sur les anciens formats de réponse
-      const downloadLink = data.downloadLink || data.DownloadLink || data.url || data.URL;
-      if (downloadLink) {
-        return downloadLink;
+      if (!downloadUrl) {
+        downloadUrl = data.downloadLink || data.DownloadLink || data.url || data.URL;
       }
 
-      throw new Error('Aucun lien de téléchargement disponible');
+      if (!downloadUrl) {
+        throw new Error('Aucun lien de téléchargement disponible');
+      }
+
+      // Télécharger la vidéo
+      const videoResponse = await fetch(downloadUrl);
+      const blob = await videoResponse.blob();
+      
+      // Créer un lien de téléchargement temporaire
+      const downloadElement = document.createElement('a');
+      downloadElement.href = URL.createObjectURL(blob);
+      downloadElement.download = `video_${Date.now()}.mp4`; // Nom du fichier par défaut
+      
+      // Déclencher le téléchargement
+      document.body.appendChild(downloadElement);
+      downloadElement.click();
+      document.body.removeChild(downloadElement);
+      
+      // Nettoyer l'URL temporaire
+      URL.revokeObjectURL(downloadElement.href);
     } catch (error) {
       console.error('Error downloading video:', error);
       throw error;
