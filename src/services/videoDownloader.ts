@@ -1,7 +1,5 @@
-import axios from 'axios';
-
-// Configuration de l'API
-const BASE_URL = "https://ssyoutube.com/api/convert"; // API plus stable et rapide
+const API_KEY = "6079|kQr3TNBAD4pT2xWNP1TBP0pNZVbM3zzeSmEw3YtN";
+const BASE_URL = "https://zylalabs.com/api/5617/social+saver+api/7304";
 
 interface VideoInfo {
   title: string;
@@ -10,23 +8,34 @@ interface VideoInfo {
   platform: string;
 }
 
+interface Media {
+  url: string;
+  quality: string;
+  extension: string;
+  type: string;
+}
+
 export const videoDownloader = {
   async getVideoInfo(url: string): Promise<VideoInfo> {
     try {
-      console.log('Fetching video info for URL:', url);
-      
-      const response = await axios.get(`${BASE_URL}`, {
-        params: {
-          url: url
-        },
+      const response = await fetch(`${BASE_URL}/download+video?url=${encodeURIComponent(url)}`, {
+        method: 'GET',
         headers: {
-          'Accept': 'application/json',
-          'Origin': window.location.origin
-        },
-        timeout: 15000 // 15 secondes timeout
+          'Authorization': `Bearer ${API_KEY}`,
+          'Accept': 'application/json'
+        }
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('API Response:', data);
 
-      console.log('API Response:', response.data);
+      if (data.error) {
+        throw new Error(data.error);
+      }
 
       // Détecter la plateforme à partir de l'URL
       let platform = 'Inconnu';
@@ -36,17 +45,22 @@ export const videoDownloader = {
       else if (url.includes('twitter.com') || url.includes('x.com')) platform = 'Twitter';
       else if (url.includes('facebook.com') || url.includes('fb.watch')) platform = 'Facebook';
 
-      // Si la réponse contient une erreur
-      if (response.data.error) {
-        console.error('API returned error:', response.data.error);
-        throw new Error(response.data.error);
+      // Convertir la durée en format lisible
+      let duration = data.duration || data.Duration || '00:00';
+      if (typeof duration === 'number') {
+        const minutes = Math.floor(duration / 60000);
+        const seconds = Math.floor((duration % 60000) / 1000);
+        duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
       }
 
-      const videoData = response.data;
+      // Gérer les différents formats de réponse selon la plateforme
+      const title = data.title || data.Title || data.caption || data.description || 'Vidéo sans titre';
+      const thumbnail = data.thumbnail || data.Thumbnail || data.cover || data.thumbnail_url || '';
+
       return {
-        title: videoData.meta?.title || 'Vidéo sans titre',
-        thumbnail: videoData.thumb || videoData.thumbnail || '',
-        duration: videoData.meta?.duration || '00:00',
+        title,
+        thumbnail,
+        duration,
         platform
       };
     } catch (error) {
@@ -57,36 +71,78 @@ export const videoDownloader = {
 
   async downloadVideo(url: string): Promise<void> {
     try {
-      console.log('Starting video download for URL:', url);
-      
-      const response = await axios.get(`${BASE_URL}`, {
-        params: {
-          url: url
-        },
+      const response = await fetch(`${BASE_URL}/download+video?url=${encodeURIComponent(url)}`, {
+        method: 'GET',
         headers: {
-          'Accept': 'application/json',
-          'Origin': window.location.origin
-        },
-        timeout: 15000
+          'Authorization': `Bearer ${API_KEY}`,
+          'Accept': 'application/json'
+        }
       });
       
-      console.log('Download API Response:', response.data);
-
-      if (response.data.error) {
-        console.error('API returned error:', response.data.error);
-        throw new Error(response.data.error);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Download Response:', data);
+      
+      let downloadUrl = '';
+      
+      // Chercher la meilleure qualité sans filigrane selon la plateforme
+      if (data.medias && Array.isArray(data.medias)) {
+        const qualities = ['hd_no_watermark', 'no_watermark', 'hd', 'high', 'sd', 'watermark'];
+        
+        for (const quality of qualities) {
+          const media = data.medias.find((m: Media) => 
+            (m.quality === quality || m.quality?.toLowerCase().includes(quality)) && 
+            m.type === 'video'
+          );
+          if (media) {
+            downloadUrl = media.url;
+            break;
+          }
+        }
       }
 
-      const downloadUrl = response.data.url || response.data.download_url;
+      // Fallback sur les différents formats de réponse selon la plateforme
       if (!downloadUrl) {
-        console.error('No download URL available');
+        downloadUrl = data.downloadLink || 
+                     data.DownloadLink || 
+                     data.url || 
+                     data.URL ||
+                     data.hd_download_url ||
+                     data.download_url ||
+                     data.video_url;
+      }
+
+      if (!downloadUrl) {
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
       // Télécharger la vidéo
-      console.log('Opening download URL:', downloadUrl);
-      window.open(downloadUrl, '_blank');
+      const videoResponse = await fetch(downloadUrl);
+      const blob = await videoResponse.blob();
       
+      // Créer un lien de téléchargement temporaire
+      const downloadElement = document.createElement('a');
+      downloadElement.href = URL.createObjectURL(blob);
+      
+      // Générer un nom de fichier basé sur la plateforme
+      const platform = url.includes('instagram.com') ? 'instagram' :
+                      url.includes('youtube.com') || url.includes('youtu.be') ? 'youtube' :
+                      url.includes('tiktok.com') ? 'tiktok' :
+                      url.includes('twitter.com') || url.includes('x.com') ? 'twitter' :
+                      url.includes('facebook.com') || url.includes('fb.watch') ? 'facebook' : 'video';
+      
+      downloadElement.download = `${platform}_${Date.now()}.mp4`;
+      
+      // Déclencher le téléchargement
+      document.body.appendChild(downloadElement);
+      downloadElement.click();
+      document.body.removeChild(downloadElement);
+      
+      // Nettoyer l'URL temporaire
+      URL.revokeObjectURL(downloadElement.href);
     } catch (error) {
       console.error('Error downloading video:', error);
       throw error;
