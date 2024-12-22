@@ -18,6 +18,7 @@ interface Media {
 export const videoDownloader = {
   async getVideoInfo(url: string): Promise<VideoInfo> {
     try {
+      console.log('Fetching video info for URL:', url);
       const response = await fetch(`${BASE_URL}/download+video?url=${encodeURIComponent(url)}`, {
         method: 'GET',
         headers: {
@@ -27,13 +28,18 @@ export const videoDownloader = {
       });
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.error('API Response status:', response.status);
+        console.error('API Response status text:', response.statusText);
+        const errorText = await response.text();
+        console.error('API Error response:', errorText);
+        throw new Error(`Erreur API: ${response.status} - ${response.statusText}`);
       }
       
       const data = await response.json();
-      console.log('API Response:', data);
+      console.log('API Response data:', data);
 
       if (data.error) {
+        console.error('API returned error:', data.error);
         throw new Error(data.error);
       }
 
@@ -71,6 +77,7 @@ export const videoDownloader = {
 
   async downloadVideo(url: string): Promise<void> {
     try {
+      console.log('Starting video download for URL:', url);
       const response = await fetch(`${BASE_URL}/download+video?url=${encodeURIComponent(url)}`, {
         method: 'GET',
         headers: {
@@ -80,11 +87,15 @@ export const videoDownloader = {
       });
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        console.error('Download API Response status:', response.status);
+        console.error('Download API Response status text:', response.statusText);
+        const errorText = await response.text();
+        console.error('Download API Error response:', errorText);
+        throw new Error(`Erreur API: ${response.status} - ${response.statusText}`);
       }
       
       const data = await response.json();
-      console.log('Download Response:', data);
+      console.log('Download API Response:', data);
       
       let downloadUrl = '';
       
@@ -118,6 +129,8 @@ export const videoDownloader = {
       if (!downloadUrl) {
         throw new Error('Aucun lien de téléchargement disponible');
       }
+
+      console.log('Download URL:', downloadUrl);
 
       // Télécharger la vidéo
       const videoResponse = await fetch(downloadUrl);
