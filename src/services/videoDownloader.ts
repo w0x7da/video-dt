@@ -1,4 +1,5 @@
 const API_KEY = "6079|kQr3TNBAD4pT2xWNP1TBP0pNZVbM3zzeSmEw3YtN";
+const BASE_URL = "https://zylalabs.com/api/5617/social+saver+api/7304";
 
 interface VideoInfo {
   title: string;
@@ -10,7 +11,7 @@ interface VideoInfo {
 export const videoDownloader = {
   async getVideoInfo(url: string): Promise<VideoInfo> {
     try {
-      const response = await fetch(`https://api.example.com/video/info?url=${encodeURIComponent(url)}`, {
+      const response = await fetch(`${BASE_URL}/download+video?url=${encodeURIComponent(url)}`, {
         headers: {
           'Authorization': `Bearer ${API_KEY}`,
           'Content-Type': 'application/json'
@@ -21,7 +22,15 @@ export const videoDownloader = {
         throw new Error('Failed to fetch video info');
       }
       
-      return await response.json();
+      const data = await response.json();
+      console.log('API Response:', data);
+
+      return {
+        title: data.title || 'Vidéo sans titre',
+        thumbnail: data.thumbnail || '',
+        duration: data.duration || '00:00',
+        platform: data.platform || 'Inconnu'
+      };
     } catch (error) {
       console.error('Error fetching video info:', error);
       throw error;
@@ -30,7 +39,7 @@ export const videoDownloader = {
 
   async downloadVideo(url: string): Promise<string> {
     try {
-      const response = await fetch(`https://api.example.com/video/download?url=${encodeURIComponent(url)}`, {
+      const response = await fetch(`${BASE_URL}/download+video?url=${encodeURIComponent(url)}`, {
         headers: {
           'Authorization': `Bearer ${API_KEY}`,
           'Content-Type': 'application/json'
@@ -42,7 +51,13 @@ export const videoDownloader = {
       }
       
       const data = await response.json();
-      return data.downloadUrl;
+      console.log('Download Response:', data);
+      
+      if (data.downloadLink) {
+        return data.downloadLink;
+      } else {
+        throw new Error('No download link available');
+      }
     } catch (error) {
       console.error('Error downloading video:', error);
       throw error;
