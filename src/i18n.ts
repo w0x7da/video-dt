@@ -15,7 +15,7 @@ export const resources = {
       'unableToDownload': 'Unable to download the video.',
       'duration': 'Duration',
       'platform': 'Platform',
-      'madeWithLove': 'Fait avec amour ♥️ pour le peuple',
+      'madeWithLove': 'Fait avec ♥️ pour le peuple',
       'youtubeDT': 'Youtube DT on iPhone'
     }
   },
@@ -32,7 +32,7 @@ export const resources = {
       'unableToDownload': 'Impossible de télécharger la vidéo.',
       'duration': 'Durée',
       'platform': 'Plateforme',
-      'madeWithLove': 'Fait avec amour ♥️ pour le peuple',
+      'madeWithLove': 'Fait avec ♥️ pour le peuple',
       'youtubeDT': 'Youtube DT sur iPhone'
     }
   },
@@ -49,7 +49,7 @@ export const resources = {
       'unableToDownload': 'No se pudo descargar el video.',
       'duration': 'Duración',
       'platform': 'Plataforma',
-      'madeWithLove': 'Fait avec amour ♥️ pour le peuple',
+      'madeWithLove': 'Fait avec ♥️ pour le peuple',
       'youtubeDT': 'Youtube DT en iPhone'
     }
   },
@@ -66,7 +66,7 @@ export const resources = {
       'unableToDownload': 'تعذر تنزيل الفيديو.',
       'duration': 'المدة',
       'platform': 'المنصة',
-      'madeWithLove': 'Fait avec amour ♥️ pour le peuple',
+      'madeWithLove': 'Fait avec ♥️ pour le peuple',
       'youtubeDT': 'يوتيوب DT على آيفون'
     }
   },
@@ -83,7 +83,7 @@ export const resources = {
       'unableToDownload': 'Impossibile scaricare il video.',
       'duration': 'Durata',
       'platform': 'Piattaforma',
-      'madeWithLove': 'Fait avec amour ♥️ pour le peuple',
+      'madeWithLove': 'Fait avec ♥️ pour le peuple',
       'youtubeDT': 'Youtube DT su iPhone'
     }
   },
@@ -100,7 +100,7 @@ export const resources = {
       'unableToDownload': 'Não foi possível baixar o vídeo.',
       'duration': 'Duração',
       'platform': 'Plataforma',
-      'madeWithLove': 'Fait avec amour ♥️ pour le peuple',
+      'madeWithLove': 'Fait avec ♥️ pour le peuple',
       'youtubeDT': 'Youtube DT no iPhone'
     }
   }
