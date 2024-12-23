@@ -21,7 +21,7 @@ export const AppleShortcut = () => {
       </a>
 
       <a 
-        href="https://www.icloud.com/shortcuts/87a987bdce2c4a729dddad698d7fff8f"
+        href="https://www.icloud.com/shortcuts/95a2e1a4cdba41cfa86eb4f74a5a7db5"
         target="_blank"
         rel="noopener noreferrer"
         className="w-full flex justify-center"
