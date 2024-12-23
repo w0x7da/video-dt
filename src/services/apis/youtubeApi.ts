@@ -14,7 +14,8 @@ export const youtubeApi = {
           'x-rapidapi-key': RAPID_API_KEY
         },
         body: new URLSearchParams({
-          url: url
+          url: url,
+          nextToken: '' // Ajout du paramètre requis
         })
       });
 
@@ -52,7 +53,8 @@ export const youtubeApi = {
           'x-rapidapi-key': RAPID_API_KEY
         },
         body: new URLSearchParams({
-          url: url
+          url: url,
+          nextToken: '' // Ajout du paramètre requis
         })
       });
 
