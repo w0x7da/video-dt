@@ -6,7 +6,7 @@ export const youtubeApi = {
     try {
       console.log('Fetching video info for URL:', url);
       const encodedUrl = encodeURIComponent(url);
-      const apiUrl = `${BASE_URL}/url?url=${encodedUrl}`;
+      const apiUrl = `${BASE_URL}/video?url=${encodedUrl}`;
       console.log('API URL:', apiUrl);
       
       const response = await fetch(apiUrl, {
@@ -41,7 +41,7 @@ export const youtubeApi = {
     try {
       console.log('Downloading video for URL:', url);
       const encodedUrl = encodeURIComponent(url);
-      const apiUrl = `${BASE_URL}/url?url=${encodedUrl}`;
+      const apiUrl = `${BASE_URL}/video?url=${encodedUrl}`;
       console.log('Download API URL:', apiUrl);
 
       const response = await fetch(apiUrl, {
