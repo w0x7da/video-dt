@@ -124,11 +124,18 @@ export const videoDownloader = {
       
       let downloadUrl = '';
       
-      // Chercher la meilleure qualité disponible dans la réponse de l'API
+      // Chercher la meilleure qualité disponible
       if (data.medias && Array.isArray(data.medias)) {
-        const videoMedia = data.medias.find((m: Media) => m.type === 'video');
-        if (videoMedia) {
-          downloadUrl = videoMedia.url;
+        // Trier les médias par qualité (supposant que la qualité est un nombre dans la chaîne)
+        const sortedMedias = data.medias.sort((a: Media, b: Media) => {
+          const qualityA = parseInt(a.quality.match(/\d+/)?.[0] || '0');
+          const qualityB = parseInt(b.quality.match(/\d+/)?.[0] || '0');
+          return qualityB - qualityA;
+        });
+        
+        // Prendre la première URL (meilleure qualité)
+        if (sortedMedias.length > 0) {
+          downloadUrl = sortedMedias[0].url;
         }
       }
 
@@ -147,7 +154,7 @@ export const videoDownloader = {
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
-      // Créer un élément a temporaire pour le téléchargement
+      // Créer un lien de téléchargement temporaire
       const downloadElement = document.createElement('a');
       downloadElement.href = downloadUrl;
       
@@ -159,7 +166,6 @@ export const videoDownloader = {
                       url.includes('facebook.com') || url.includes('fb.watch') ? 'facebook' : 'video';
       
       downloadElement.download = `${platform}_${Date.now()}.mp4`;
-      downloadElement.target = '_blank';
       
       // Déclencher le téléchargement
       document.body.appendChild(downloadElement);
