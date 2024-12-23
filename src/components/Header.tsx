@@ -2,14 +2,26 @@ import { Globe, RefreshCw } from "lucide-react";
 import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Header = () => {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
 
-  const toggleLanguage = () => {
-    const newLang = i18n.language === 'en' ? 'fr' : 'en';
-    i18n.changeLanguage(newLang);
+  const languages = {
+    en: { name: 'English', flag: '🇬🇧' },
+    fr: { name: 'Français', flag: '🇫🇷' },
+    es: { name: 'Español', flag: '🇪🇸' },
+    ar: { name: 'العربية', flag: '🇸🇦' }
+  };
+
+  const changeLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
   };
 
   return (
@@ -22,14 +34,29 @@ export const Header = () => {
         DT Vidéo
       </button>
       
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={toggleLanguage}
-        className="hover:bg-secondary"
-      >
-        <Globe className="w-5 h-5" />
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hover:bg-secondary"
+          >
+            <Globe className="w-5 h-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {Object.entries(languages).map(([code, { name, flag }]) => (
+            <DropdownMenuItem
+              key={code}
+              onClick={() => changeLanguage(code)}
+              className="cursor-pointer"
+            >
+              <span className="mr-2">{flag}</span>
+              {name}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </header>
   );
 };

@@ -13,8 +13,7 @@ export const AppleShortcut = () => {
         rel="noopener noreferrer"
       >
         <Button 
-          variant="outline" 
-          className="bg-white hover:bg-gray-50 border-2"
+          className="bg-black hover:bg-gray-800 text-white border-none"
         >
           {t('getOne')} <Apple className="ml-2" />
         </Button>

@@ -33,6 +33,38 @@ const resources = {
       'unableToFetch': 'Impossible de récupérer les informations de la vidéo',
       'unableToDownload': 'Impossible de télécharger la vidéo'
     }
+  },
+  es: {
+    translation: {
+      'getOne': 'Obtener',
+      'videoDownloader': 'Descargador de Videos',
+      'pasteUrl': 'Pega la URL del video aquí',
+      'check': 'Verificar',
+      'download': 'Descargar',
+      'duration': 'Duración',
+      'platform': 'Plataforma',
+      'downloadStarted': 'Descarga iniciada',
+      'error': 'Error',
+      'invalidUrl': 'Por favor, introduce una URL válida',
+      'unableToFetch': 'No se pudo obtener la información del video',
+      'unableToDownload': 'No se pudo descargar el video'
+    }
+  },
+  ar: {
+    translation: {
+      'getOne': 'احصل على واحد',
+      'videoDownloader': 'تحميل الفيديو',
+      'pasteUrl': 'الصق رابط الفيديو هنا',
+      'check': 'تحقق',
+      'download': 'تحميل',
+      'duration': 'المدة',
+      'platform': 'المنصة',
+      'downloadStarted': 'بدأ التحميل',
+      'error': 'خطأ',
+      'invalidUrl': 'الرجاء إدخال رابط صحيح',
+      'unableToFetch': 'تعذر جلب معلومات الفيديو',
+      'unableToDownload': 'تعذر تحميل الفيديو'
+    }
   }
 };
 
