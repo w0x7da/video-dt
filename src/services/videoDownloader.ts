@@ -42,18 +42,14 @@ export const videoDownloader = {
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
-      // Télécharger directement le fichier
-      const response = await fetch(downloadUrl);
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-      
+      // Créer un lien <a> et simuler un clic pour déclencher le téléchargement
       const downloadElement = document.createElement('a');
-      downloadElement.href = blobUrl;
+      downloadElement.href = downloadUrl;
       downloadElement.download = filename;
+      downloadElement.target = '_blank'; // Ouvrir dans un nouvel onglet
       document.body.appendChild(downloadElement);
       downloadElement.click();
       document.body.removeChild(downloadElement);
-      window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
       console.error('Error downloading video:', error);
       throw error;
