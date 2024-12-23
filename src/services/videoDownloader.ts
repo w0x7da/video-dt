@@ -24,7 +24,8 @@ export const videoDownloader = {
       let method = 'GET';
       const headers = {
         'Authorization': `Bearer ${API_KEY}`,
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       };
       
       // Déterminer quelle API utiliser en fonction de l'URL
@@ -93,7 +94,8 @@ export const videoDownloader = {
       let method = 'GET';
       const headers = {
         'Authorization': `Bearer ${API_KEY}`,
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       };
       
       // Déterminer quelle API utiliser en fonction de l'URL
@@ -153,8 +155,18 @@ export const videoDownloader = {
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
-      // Télécharger la vidéo
-      const videoResponse = await fetch(downloadUrl);
+      // Télécharger la vidéo avec mode no-cors pour éviter les erreurs CORS
+      const videoResponse = await fetch(downloadUrl, {
+        mode: 'no-cors',
+        headers: {
+          'Accept': '*/*'
+        }
+      });
+      
+      if (!videoResponse.ok && videoResponse.type !== 'opaque') {
+        throw new Error('Erreur lors du téléchargement de la vidéo');
+      }
+
       const blob = await videoResponse.blob();
       
       // Créer un lien de téléchargement temporaire
