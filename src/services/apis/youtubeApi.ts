@@ -1,5 +1,5 @@
 const RAPID_API_KEY = "9aed925b29msh2aa707be2332276p12fd68jsncf8eccea39b7";
-const BASE_URL = "https://super-fast-youtube-to-mp3-and-mp4-converter.p.rapidapi.com";
+const BASE_URL = "https://super-fast-youtube-to-mp3-and-mp4-converter.p.rapidapi.com/developers";
 
 const MAX_RETRIES = 3;
 const TIMEOUT = 30000; // 30 secondes
@@ -62,7 +62,8 @@ export const youtubeApi = {
         method: 'GET',
         headers: {
           'x-rapidapi-host': 'super-fast-youtube-to-mp3-and-mp4-converter.p.rapidapi.com',
-          'x-rapidapi-key': RAPID_API_KEY
+          'x-rapidapi-key': RAPID_API_KEY,
+          'Accept': 'application/json'
         }
       });
 
@@ -94,7 +95,8 @@ export const youtubeApi = {
         method: 'GET',
         headers: {
           'x-rapidapi-host': 'super-fast-youtube-to-mp3-and-mp4-converter.p.rapidapi.com',
-          'x-rapidapi-key': RAPID_API_KEY
+          'x-rapidapi-key': RAPID_API_KEY,
+          'Accept': 'application/json'
         }
       });
 
