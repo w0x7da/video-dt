@@ -124,19 +124,11 @@ export const videoDownloader = {
       
       let downloadUrl = '';
       
-      // Chercher la meilleure qualité sans filigrane selon la plateforme
+      // Chercher la meilleure qualité disponible dans la réponse de l'API
       if (data.medias && Array.isArray(data.medias)) {
-        const qualities = ['hd_no_watermark', 'no_watermark', 'hd', 'high', 'sd', 'watermark'];
-        
-        for (const quality of qualities) {
-          const media = data.medias.find((m: Media) => 
-            (m.quality === quality || m.quality?.toLowerCase().includes(quality)) && 
-            m.type === 'video'
-          );
-          if (media) {
-            downloadUrl = media.url;
-            break;
-          }
+        const videoMedia = data.medias.find((m: Media) => m.type === 'video');
+        if (videoMedia) {
+          downloadUrl = videoMedia.url;
         }
       }
 
@@ -155,23 +147,9 @@ export const videoDownloader = {
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
-      // Télécharger la vidéo avec mode no-cors pour éviter les erreurs CORS
-      const videoResponse = await fetch(downloadUrl, {
-        mode: 'no-cors',
-        headers: {
-          'Accept': '*/*'
-        }
-      });
-      
-      if (!videoResponse.ok && videoResponse.type !== 'opaque') {
-        throw new Error('Erreur lors du téléchargement de la vidéo');
-      }
-
-      const blob = await videoResponse.blob();
-      
-      // Créer un lien de téléchargement temporaire
+      // Créer un élément a temporaire pour le téléchargement
       const downloadElement = document.createElement('a');
-      downloadElement.href = URL.createObjectURL(blob);
+      downloadElement.href = downloadUrl;
       
       // Générer un nom de fichier basé sur la plateforme
       const platform = url.includes('instagram.com') ? 'instagram' :
@@ -181,14 +159,12 @@ export const videoDownloader = {
                       url.includes('facebook.com') || url.includes('fb.watch') ? 'facebook' : 'video';
       
       downloadElement.download = `${platform}_${Date.now()}.mp4`;
+      downloadElement.target = '_blank';
       
       // Déclencher le téléchargement
       document.body.appendChild(downloadElement);
       downloadElement.click();
       document.body.removeChild(downloadElement);
-      
-      // Nettoyer l'URL temporaire
-      URL.revokeObjectURL(downloadElement.href);
     } catch (error) {
       console.error('Error downloading video:', error);
       throw error;
