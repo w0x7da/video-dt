@@ -3,16 +3,13 @@ const BASE_URL = "https://youtube-to-mp4.p.rapidapi.com";
 
 export const youtubeApi = {
   async getVideoInfo(url: string) {
-    const params = new URLSearchParams({
-      url: url
-    });
-    const apiUrl = `${BASE_URL}/url?${params.toString()}`;
+    const apiUrl = `${BASE_URL}/url=&title?url=${encodeURIComponent(url)}`;
     
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
-        'X-RapidAPI-Host': 'youtube-to-mp4.p.rapidapi.com',
-        'X-RapidAPI-Key': RAPID_API_KEY
+        'x-rapidapi-host': 'youtube-to-mp4.p.rapidapi.com',
+        'x-rapidapi-key': RAPID_API_KEY
       }
     });
 
@@ -30,16 +27,13 @@ export const youtubeApi = {
   },
 
   async downloadVideo(url: string) {
-    const params = new URLSearchParams({
-      url: url
-    });
-    const apiUrl = `${BASE_URL}/url?${params.toString()}`;
+    const apiUrl = `${BASE_URL}/url=&title?url=${encodeURIComponent(url)}`;
     
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
-        'X-RapidAPI-Host': 'youtube-to-mp4.p.rapidapi.com',
-        'X-RapidAPI-Key': RAPID_API_KEY
+        'x-rapidapi-host': 'youtube-to-mp4.p.rapidapi.com',
+        'x-rapidapi-key': RAPID_API_KEY
       }
     });
 
