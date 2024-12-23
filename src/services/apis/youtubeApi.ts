@@ -1,13 +1,14 @@
 const RAPID_API_KEY = "9aed925b29msh2aa707be2332276p12fd68jsncf8eccea39b7";
-const BASE_URL = "https://youtube-to-mp4.p.rapidapi.com/url=&title";
+const BASE_URL = "https://youtube-to-mp4.p.rapidapi.com";
 
 export const youtubeApi = {
   async getVideoInfo(url: string) {
-    const apiUrl = `${BASE_URL}?url=${encodeURIComponent(url)}`;
+    const apiUrl = `${BASE_URL}/url=&title?url=${encodeURIComponent(url)}`;
     const response = await fetch(apiUrl, {
+      method: 'GET',
       headers: {
-        'x-rapidapi-host': 'youtube-to-mp4.p.rapidapi.com',
-        'x-rapidapi-key': RAPID_API_KEY
+        'X-RapidAPI-Host': 'youtube-to-mp4.p.rapidapi.com',
+        'X-RapidAPI-Key': RAPID_API_KEY
       }
     });
 
@@ -25,11 +26,12 @@ export const youtubeApi = {
   },
 
   async downloadVideo(url: string) {
-    const apiUrl = `${BASE_URL}?url=${encodeURIComponent(url)}`;
+    const apiUrl = `${BASE_URL}/url=&title?url=${encodeURIComponent(url)}`;
     const response = await fetch(apiUrl, {
+      method: 'GET',
       headers: {
-        'x-rapidapi-host': 'youtube-to-mp4.p.rapidapi.com',
-        'x-rapidapi-key': RAPID_API_KEY
+        'X-RapidAPI-Host': 'youtube-to-mp4.p.rapidapi.com',
+        'X-RapidAPI-Key': RAPID_API_KEY
       }
     });
 
