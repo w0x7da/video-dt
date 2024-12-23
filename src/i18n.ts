@@ -53,40 +53,6 @@ export const resources = {
       'youtubeDT': 'Youtube DT en iPhone'
     }
   },
-  it: {
-    translation: {
-      'getOne': 'Ottieni su',
-      'videoDownloader': 'Scaricatore di Video',
-      'pasteUrl': 'Incolla URL',
-      'check': 'Verifica',
-      'error': 'Errore',
-      'invalidUrl': 'URL non valido',
-      'unableToFetch': 'Impossibile recuperare le informazioni del video.',
-      'downloadStarted': 'Il download è iniziato.',
-      'unableToDownload': 'Impossibile scaricare il video.',
-      'duration': 'Durata',
-      'platform': 'Piattaforma',
-      'madeWithLove': 'Fatto con ♥️ da Walid 🙂‍↕️',
-      'youtubeDT': 'Youtube DT su iPhone'
-    }
-  },
-  pt: {
-    translation: {
-      'getOne': 'Obter no',
-      'videoDownloader': 'Baixador de Vídeos',
-      'pasteUrl': 'Colar URL',
-      'check': 'Verificar',
-      'error': 'Erro',
-      'invalidUrl': 'URL inválido',
-      'unableToFetch': 'Não foi possível obter as informações do vídeo.',
-      'downloadStarted': 'O download começou.',
-      'unableToDownload': 'Não foi possível baixar o vídeo.',
-      'duration': 'Duração',
-      'platform': 'Plataforma',
-      'madeWithLove': 'Feito com ♥️ por Walid 🙂‍↕️',
-      'youtubeDT': 'Youtube DT no iPhone'
-    }
-  },
   ar: {
     translation: {
       'getOne': 'احصل على',
