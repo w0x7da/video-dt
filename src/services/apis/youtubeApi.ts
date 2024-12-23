@@ -1,15 +1,21 @@
 const RAPID_API_KEY = "9aed925b29msh2aa707be2332276p12fd68jsncf8eccea39b7";
-const BASE_URL = "https://youtube-media-downloader.p.rapidapi.com/v2/video/subtitles";
+const BASE_URL = "https://ytstream-download-youtube-videos.p.rapidapi.com/dl";
 
 export const youtubeApi = {
   async getVideoInfo(url: string) {
     try {
       console.log('Fetching video info for URL:', url);
       
-      const response = await fetch(`${BASE_URL}?format=xml`, {
+      // Extraire l'ID de la vidéo de l'URL YouTube
+      const videoId = extractYoutubeId(url);
+      if (!videoId) {
+        throw new Error('ID de vidéo YouTube invalide');
+      }
+
+      const response = await fetch(`${BASE_URL}?id=${videoId}`, {
         method: 'GET',
         headers: {
-          'x-rapidapi-host': 'youtube-media-downloader.p.rapidapi.com',
+          'x-rapidapi-host': 'ytstream-download-youtube-videos.p.rapidapi.com',
           'x-rapidapi-key': RAPID_API_KEY
         }
       });
@@ -22,11 +28,10 @@ export const youtubeApi = {
       const data = await response.json();
       console.log('API Response data:', data);
 
-      // Extraction des informations pertinentes de la réponse
       return {
         title: data?.title || 'Vidéo YouTube',
-        thumbnail: data?.thumbnail?.url || '',
-        duration: data?.duration || '00:00',
+        thumbnail: data?.thumb?.url || '',
+        duration: formatDuration(data?.length) || '00:00',
         platform: 'YouTube'
       };
     } catch (error) {
@@ -39,10 +44,16 @@ export const youtubeApi = {
     try {
       console.log('Downloading video for URL:', url);
       
-      const response = await fetch(`${BASE_URL}?format=xml`, {
+      // Extraire l'ID de la vidéo de l'URL YouTube
+      const videoId = extractYoutubeId(url);
+      if (!videoId) {
+        throw new Error('ID de vidéo YouTube invalide');
+      }
+
+      const response = await fetch(`${BASE_URL}?id=${videoId}`, {
         method: 'GET',
         headers: {
-          'x-rapidapi-host': 'youtube-media-downloader.p.rapidapi.com',
+          'x-rapidapi-host': 'ytstream-download-youtube-videos.p.rapidapi.com',
           'x-rapidapi-key': RAPID_API_KEY
         }
       });
@@ -55,8 +66,8 @@ export const youtubeApi = {
       const data = await response.json();
       console.log('Download API Response data:', data);
 
-      // Récupération du lien de téléchargement
-      const downloadUrl = data?.url;
+      // Récupérer le lien de la meilleure qualité disponible
+      const downloadUrl = data?.formats?.[0]?.url;
       
       if (!downloadUrl) {
         throw new Error('Aucun lien de téléchargement disponible');
@@ -69,3 +80,18 @@ export const youtubeApi = {
     }
   }
 };
+
+// Fonction utilitaire pour extraire l'ID d'une vidéo YouTube d'une URL
+function extractYoutubeId(url: string): string | null {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+}
+
+// Fonction utilitaire pour formater la durée
+function formatDuration(seconds: number): string {
+  if (!seconds) return '00:00';
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
