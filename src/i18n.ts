@@ -4,7 +4,6 @@ import { initReactI18next } from 'react-i18next';
 export const resources = {
   en: {
     translation: {
-      'getOne': 'Get on',
       'videoDownloader': 'Video Downloader',
       'pasteUrl': 'Paste URL',
       'check': 'Check',
@@ -19,7 +18,6 @@ export const resources = {
   },
   fr: {
     translation: {
-      'getOne': 'Obtenir sur',
       'videoDownloader': 'Téléchargeur de vidéos',
       'pasteUrl': 'Coller l\'URL',
       'check': 'Vérifier',
@@ -34,7 +32,6 @@ export const resources = {
   },
   es: {
     translation: {
-      'getOne': 'Obtener en',
       'videoDownloader': 'Descargador de videos',
       'pasteUrl': 'Pegar URL',
       'check': 'Verificar',
@@ -49,7 +46,6 @@ export const resources = {
   },
   ar: {
     translation: {
-      'getOne': 'احصل على',
       'videoDownloader': 'محمل الفيديو',
       'pasteUrl': 'الصق الرابط',
       'check': 'تحقق',
