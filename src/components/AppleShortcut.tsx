@@ -27,7 +27,7 @@ export const AppleShortcut = () => {
         <Button 
           className="bg-black hover:bg-gray-800 text-white border-none"
         >
-          {t('getOne')} YouTube <Smartphone className="ml-2" />
+          {t('getOne')} Youtube Mp4 <Smartphone className="ml-2" />
         </Button>
       </a>
     </div>
