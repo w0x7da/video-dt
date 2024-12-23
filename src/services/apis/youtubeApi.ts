@@ -1,5 +1,5 @@
 const RAPID_API_KEY = "9aed925b29msh2aa707be2332276p12fd68jsncf8eccea39b7";
-const BASE_URL = "https://free-mp3-mp4-youtube.p.rapidapi.com";
+const BASE_URL = "https://premium-youtube-mp3-converter-and-mp4-downloader.p.rapidapi.com/api/v4";
 
 const MAX_RETRIES = 3;
 const TIMEOUT = 30000; // 30 secondes
@@ -48,6 +48,57 @@ async function fetchWithRetry(url: string, options: RequestInit, retries: number
   throw new Error('Max retries reached');
 }
 
+async function initiateConversion(videoId: string) {
+  const response = await fetchWithRetry(`${BASE_URL}/convert`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'Accept': 'application/json',
+      'x-rapidapi-host': 'premium-youtube-mp3-converter-and-mp4-downloader.p.rapidapi.com',
+      'x-rapidapi-key': RAPID_API_KEY
+    },
+    body: JSON.stringify({
+      url: `https://www.youtube.com/watch?v=${videoId}`,
+      format: 'mp4'
+    })
+  });
+
+  const data = await response.json();
+  return data.id; // Retourne l'ID de conversion
+}
+
+async function checkConversionStatus(conversionId: string) {
+  const response = await fetchWithRetry(`${BASE_URL}/status/${conversionId}`, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'x-rapidapi-host': 'premium-youtube-mp3-converter-and-mp4-downloader.p.rapidapi.com',
+      'x-rapidapi-key': RAPID_API_KEY
+    }
+  });
+
+  return await response.json();
+}
+
+async function waitForConversion(conversionId: string, maxAttempts = 10): Promise<any> {
+  for (let i = 0; i < maxAttempts; i++) {
+    const status = await checkConversionStatus(conversionId);
+    
+    if (status.status === 'completed') {
+      return status;
+    }
+    
+    if (status.status === 'failed') {
+      throw new Error('La conversion a échoué');
+    }
+    
+    // Attendre 2 secondes avant la prochaine vérification
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  }
+  
+  throw new Error('Délai de conversion dépassé');
+}
+
 export const youtubeApi = {
   async getVideoInfo(url: string) {
     try {
@@ -58,24 +109,13 @@ export const youtubeApi = {
         throw new Error('ID de vidéo YouTube invalide');
       }
 
-      // Construction de l'URL avec les paramètres de style par défaut
-      const apiUrl = `${BASE_URL}/${videoId}/MP4/spinner/2196f3/100/box-button/2196f3/tiny-button/Download/FFFFFF/yes/FFFFFF/none`;
-
-      const response = await fetchWithRetry(apiUrl, {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-host': 'free-mp3-mp4-youtube.p.rapidapi.com',
-          'x-rapidapi-key': RAPID_API_KEY
-        }
-      });
-
-      const data = await response.json();
-      console.log('API Response data:', data);
+      const conversionId = await initiateConversion(videoId);
+      const conversionData = await waitForConversion(conversionId);
 
       return {
-        title: data?.title || 'Vidéo YouTube',
-        thumbnail: data?.thumbnail || '',
-        duration: formatDuration(data?.duration) || '00:00',
+        title: conversionData.title || 'Vidéo YouTube',
+        thumbnail: conversionData.thumbnail || '',
+        duration: formatDuration(conversionData.duration) || '00:00',
         platform: 'YouTube'
       };
     } catch (error) {
@@ -93,27 +133,14 @@ export const youtubeApi = {
         throw new Error('ID de vidéo YouTube invalide');
       }
 
-      const apiUrl = `${BASE_URL}/${videoId}/MP4/spinner/2196f3/100/box-button/2196f3/tiny-button/Download/FFFFFF/yes/FFFFFF/none`;
+      const conversionId = await initiateConversion(videoId);
+      const conversionData = await waitForConversion(conversionId);
 
-      const response = await fetchWithRetry(apiUrl, {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-host': 'free-mp3-mp4-youtube.p.rapidapi.com',
-          'x-rapidapi-key': RAPID_API_KEY
-        }
-      });
-
-      const data = await response.json();
-      console.log('Download API Response data:', data);
-
-      // On prend l'URL de téléchargement directement depuis la réponse
-      const downloadUrl = data?.url;
-      
-      if (!downloadUrl) {
+      if (!conversionData.url) {
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
-      return downloadUrl;
+      return conversionData.url;
     } catch (error) {
       console.error('Error in downloadVideo:', error);
       throw error;
