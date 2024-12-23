@@ -1,81 +1,62 @@
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-
-const resources = {
+export const resources = {
   en: {
     translation: {
-      'getOne': 'Get one',
+      'getOne': 'Get on',
       'videoDownloader': 'Video Downloader',
-      'pasteUrl': 'Paste video URL here',
+      'pasteUrl': 'Paste URL',
       'check': 'Check',
-      'download': 'Download',
+      'error': 'Error',
+      'invalidUrl': 'Invalid URL',
+      'unableToFetch': 'Unable to fetch video information.',
+      'downloadStarted': 'Download has started.',
+      'unableToDownload': 'Unable to download the video.',
       'duration': 'Duration',
       'platform': 'Platform',
-      'downloadStarted': 'Download started',
-      'error': 'Error',
-      'invalidUrl': 'Please enter a valid URL',
-      'unableToFetch': 'Unable to fetch video information',
-      'unableToDownload': 'Unable to download video'
     }
   },
   fr: {
     translation: {
-      'getOne': 'Obtenir',
-      'videoDownloader': 'Téléchargeur de Vidéos',
-      'pasteUrl': 'Collez l\'URL de la vidéo ici',
+      'getOne': 'Obtenir sur',
+      'videoDownloader': 'Téléchargeur de vidéos',
+      'pasteUrl': 'Coller l\'URL',
       'check': 'Vérifier',
-      'download': 'Télécharger',
+      'error': 'Erreur',
+      'invalidUrl': 'URL invalide',
+      'unableToFetch': 'Impossible de récupérer les informations vidéo.',
+      'downloadStarted': 'Le téléchargement a commencé.',
+      'unableToDownload': 'Impossible de télécharger la vidéo.',
       'duration': 'Durée',
       'platform': 'Plateforme',
-      'downloadStarted': 'Téléchargement démarré',
-      'error': 'Erreur',
-      'invalidUrl': 'Veuillez entrer une URL valide',
-      'unableToFetch': 'Impossible de récupérer les informations de la vidéo',
-      'unableToDownload': 'Impossible de télécharger la vidéo'
     }
   },
   es: {
     translation: {
-      'getOne': 'Obtener',
-      'videoDownloader': 'Descargador de Videos',
-      'pasteUrl': 'Pega la URL del video aquí',
+      'getOne': 'Obtener en',
+      'videoDownloader': 'Descargador de videos',
+      'pasteUrl': 'Pegar URL',
       'check': 'Verificar',
-      'download': 'Descargar',
+      'error': 'Error',
+      'invalidUrl': 'URL inválida',
+      'unableToFetch': 'No se pudo obtener la información del video.',
+      'downloadStarted': 'La descarga ha comenzado.',
+      'unableToDownload': 'No se pudo descargar el video.',
       'duration': 'Duración',
       'platform': 'Plataforma',
-      'downloadStarted': 'Descarga iniciada',
-      'error': 'Error',
-      'invalidUrl': 'Por favor, introduce una URL válida',
-      'unableToFetch': 'No se pudo obtener la información del video',
-      'unableToDownload': 'No se pudo descargar el video'
     }
   },
   ar: {
     translation: {
-      'getOne': 'احصل على واحد',
-      'videoDownloader': 'تحميل الفيديو',
-      'pasteUrl': 'الصق رابط الفيديو هنا',
+      'getOne': 'احصل على',
+      'videoDownloader': 'محمل الفيديو',
+      'pasteUrl': 'الصق الرابط',
       'check': 'تحقق',
-      'download': 'تحميل',
+      'error': 'خطأ',
+      'invalidUrl': 'رابط غير صالح',
+      'unableToFetch': 'تعذر الحصول على معلومات الفيديو.',
+      'downloadStarted': 'بدأ التنزيل.',
+      'unableToDownload': 'تعذر تنزيل الفيديو.',
       'duration': 'المدة',
       'platform': 'المنصة',
-      'downloadStarted': 'بدأ التحميل',
-      'error': 'خطأ',
-      'invalidUrl': 'الرجاء إدخال رابط صحيح',
-      'unableToFetch': 'تعذر جلب معلومات الفيديو',
-      'unableToDownload': 'تعذر تحميل الفيديو'
     }
   }
 };
-
-i18n
-  .use(initReactI18next)
-  .init({
-    resources,
-    lng: 'fr',
-    interpolation: {
-      escapeValue: false
-    }
-  });
-
-export default i18n;
