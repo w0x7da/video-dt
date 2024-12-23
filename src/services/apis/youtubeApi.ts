@@ -1,29 +1,70 @@
 const RAPID_API_KEY = "9aed925b29msh2aa707be2332276p12fd68jsncf8eccea39b7";
 const BASE_URL = "https://ytstream-download-youtube-videos.p.rapidapi.com/dl";
 
+const MAX_RETRIES = 3;
+const TIMEOUT = 30000; // 30 secondes
+
+async function fetchWithTimeout(url: string, options: RequestInit, timeout: number) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
+  }
+}
+
+async function fetchWithRetry(url: string, options: RequestInit, retries: number = MAX_RETRIES) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetchWithTimeout(url, options, TIMEOUT);
+      
+      if (!response.ok) {
+        const errorBody = await response.text();
+        console.error(`Attempt ${i + 1} failed with status ${response.status}:`, errorBody);
+        
+        if (response.status === 504 && i < retries - 1) {
+          console.log(`Retrying... Attempt ${i + 2} of ${retries}`);
+          continue;
+        }
+        
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return response;
+    } catch (error) {
+      if (i === retries - 1) throw error;
+      console.log(`Attempt ${i + 1} failed, retrying...`);
+      await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1))); // Exponential backoff
+    }
+  }
+  throw new Error('Max retries reached');
+}
+
 export const youtubeApi = {
   async getVideoInfo(url: string) {
     try {
       console.log('Fetching video info for URL:', url);
       
-      // Extraire l'ID de la vidéo de l'URL YouTube
       const videoId = extractYoutubeId(url);
       if (!videoId) {
         throw new Error('ID de vidéo YouTube invalide');
       }
 
-      const response = await fetch(`${BASE_URL}?id=${videoId}`, {
+      const response = await fetchWithRetry(`${BASE_URL}?id=${videoId}`, {
         method: 'GET',
         headers: {
           'x-rapidapi-host': 'ytstream-download-youtube-videos.p.rapidapi.com',
           'x-rapidapi-key': RAPID_API_KEY
         }
       });
-
-      if (!response.ok) {
-        console.error('API Response not OK:', response.status, response.statusText);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
 
       const data = await response.json();
       console.log('API Response data:', data);
@@ -44,13 +85,12 @@ export const youtubeApi = {
     try {
       console.log('Downloading video for URL:', url);
       
-      // Extraire l'ID de la vidéo de l'URL YouTube
       const videoId = extractYoutubeId(url);
       if (!videoId) {
         throw new Error('ID de vidéo YouTube invalide');
       }
 
-      const response = await fetch(`${BASE_URL}?id=${videoId}`, {
+      const response = await fetchWithRetry(`${BASE_URL}?id=${videoId}`, {
         method: 'GET',
         headers: {
           'x-rapidapi-host': 'ytstream-download-youtube-videos.p.rapidapi.com',
@@ -58,15 +98,9 @@ export const youtubeApi = {
         }
       });
 
-      if (!response.ok) {
-        console.error('Download API Response not OK:', response.status, response.statusText);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       const data = await response.json();
       console.log('Download API Response data:', data);
 
-      // Récupérer le lien de la meilleure qualité disponible
       const downloadUrl = data?.formats?.[0]?.url;
       
       if (!downloadUrl) {
