@@ -1,5 +1,5 @@
 const RAPID_API_KEY = "9aed925b29msh2aa707be2332276p12fd68jsncf8eccea39b7";
-const BASE_URL = "https://ytstream-download-youtube-videos.p.rapidapi.com/dl";
+const BASE_URL = "https://cloud-api-hub-youtube-downloader.p.rapidapi.com/download";
 
 const MAX_RETRIES = 3;
 const TIMEOUT = 30000; // 30 secondes
@@ -58,10 +58,10 @@ export const youtubeApi = {
         throw new Error('ID de vidéo YouTube invalide');
       }
 
-      const response = await fetchWithRetry(`${BASE_URL}?id=${videoId}`, {
+      const response = await fetchWithRetry(`${BASE_URL}?id=${videoId}&filter=video&quality=highest`, {
         method: 'GET',
         headers: {
-          'x-rapidapi-host': 'ytstream-download-youtube-videos.p.rapidapi.com',
+          'x-rapidapi-host': 'cloud-api-hub-youtube-downloader.p.rapidapi.com',
           'x-rapidapi-key': RAPID_API_KEY
         }
       });
@@ -71,8 +71,8 @@ export const youtubeApi = {
 
       return {
         title: data?.title || 'Vidéo YouTube',
-        thumbnail: data?.thumb?.url || '',
-        duration: formatDuration(data?.length) || '00:00',
+        thumbnail: data?.thumbnail || '',
+        duration: formatDuration(data?.duration) || '00:00',
         platform: 'YouTube'
       };
     } catch (error) {
@@ -90,10 +90,10 @@ export const youtubeApi = {
         throw new Error('ID de vidéo YouTube invalide');
       }
 
-      const response = await fetchWithRetry(`${BASE_URL}?id=${videoId}`, {
+      const response = await fetchWithRetry(`${BASE_URL}?id=${videoId}&filter=video&quality=highest`, {
         method: 'GET',
         headers: {
-          'x-rapidapi-host': 'ytstream-download-youtube-videos.p.rapidapi.com',
+          'x-rapidapi-host': 'cloud-api-hub-youtube-downloader.p.rapidapi.com',
           'x-rapidapi-key': RAPID_API_KEY
         }
       });
@@ -101,7 +101,7 @@ export const youtubeApi = {
       const data = await response.json();
       console.log('Download API Response data:', data);
 
-      const downloadUrl = data?.formats?.[0]?.url;
+      const downloadUrl = data?.url;
       
       if (!downloadUrl) {
         throw new Error('Aucun lien de téléchargement disponible');
