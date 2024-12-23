@@ -17,7 +17,9 @@ export const Header = () => {
     en: { name: 'English', flag: '🇬🇧' },
     fr: { name: 'Français', flag: '🇫🇷' },
     es: { name: 'Español', flag: '🇪🇸' },
-    ar: { name: 'العربية', flag: '🇸🇦' }
+    ar: { name: 'العربية', flag: '🇸🇦' },
+    it: { name: 'Italiano', flag: '🇮🇹' },
+    pt: { name: 'Português', flag: '🇵🇹' }
   };
 
   const changeLanguage = (lang: string) => {
