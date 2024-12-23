@@ -124,18 +124,19 @@ export const videoDownloader = {
       
       let downloadUrl = '';
       
-      // Chercher la meilleure qualité disponible
+      // Chercher la meilleure qualité sans filigrane selon la plateforme
       if (data.medias && Array.isArray(data.medias)) {
-        // Trier les médias par qualité (supposant que la qualité est un nombre dans la chaîne)
-        const sortedMedias = data.medias.sort((a: Media, b: Media) => {
-          const qualityA = parseInt(a.quality.match(/\d+/)?.[0] || '0');
-          const qualityB = parseInt(b.quality.match(/\d+/)?.[0] || '0');
-          return qualityB - qualityA;
-        });
+        const qualities = ['hd_no_watermark', 'no_watermark', 'hd', 'high', 'sd', 'watermark'];
         
-        // Prendre la première URL (meilleure qualité)
-        if (sortedMedias.length > 0) {
-          downloadUrl = sortedMedias[0].url;
+        for (const quality of qualities) {
+          const media = data.medias.find((m: Media) => 
+            (m.quality === quality || m.quality?.toLowerCase().includes(quality)) && 
+            m.type === 'video'
+          );
+          if (media) {
+            downloadUrl = media.url;
+            break;
+          }
         }
       }
 
@@ -154,9 +155,23 @@ export const videoDownloader = {
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
+      // Télécharger la vidéo avec mode no-cors pour éviter les erreurs CORS
+      const videoResponse = await fetch(downloadUrl, {
+        mode: 'no-cors',
+        headers: {
+          'Accept': '*/*'
+        }
+      });
+      
+      if (!videoResponse.ok && videoResponse.type !== 'opaque') {
+        throw new Error('Erreur lors du téléchargement de la vidéo');
+      }
+
+      const blob = await videoResponse.blob();
+      
       // Créer un lien de téléchargement temporaire
       const downloadElement = document.createElement('a');
-      downloadElement.href = downloadUrl;
+      downloadElement.href = URL.createObjectURL(blob);
       
       // Générer un nom de fichier basé sur la plateforme
       const platform = url.includes('instagram.com') ? 'instagram' :
@@ -171,6 +186,9 @@ export const videoDownloader = {
       document.body.appendChild(downloadElement);
       downloadElement.click();
       document.body.removeChild(downloadElement);
+      
+      // Nettoyer l'URL temporaire
+      URL.revokeObjectURL(downloadElement.href);
     } catch (error) {
       console.error('Error downloading video:', error);
       throw error;
