@@ -15,7 +15,8 @@ export const resources = {
       'unableToDownload': 'Unable to download the video.',
       'duration': 'Duration',
       'platform': 'Platform',
-      'madeWithLove': 'Made with ♥️ by Walid 🙂‍↕️'
+      'madeWithLove': 'Made with ♥️ by Walid 🙂‍↕️',
+      'youtubeDT': 'Youtube DT on iPhone'
     }
   },
   fr: {
@@ -31,7 +32,8 @@ export const resources = {
       'unableToDownload': 'Impossible de télécharger la vidéo.',
       'duration': 'Durée',
       'platform': 'Plateforme',
-      'madeWithLove': 'Fait avec ♥️ par Walid 🙂‍↕️'
+      'madeWithLove': 'Fait avec ♥️ par Walid 🙂‍↕️',
+      'youtubeDT': 'Youtube DT sur iPhone'
     }
   },
   es: {
@@ -47,7 +49,8 @@ export const resources = {
       'unableToDownload': 'No se pudo descargar el video.',
       'duration': 'Duración',
       'platform': 'Plataforma',
-      'madeWithLove': 'Hecho con ♥️ por Walid 🙂‍↕️'
+      'madeWithLove': 'Hecho con ♥️ por Walid 🙂‍↕️',
+      'youtubeDT': 'Youtube DT en iPhone'
     }
   },
   it: {
@@ -63,7 +66,8 @@ export const resources = {
       'unableToDownload': 'Impossibile scaricare il video.',
       'duration': 'Durata',
       'platform': 'Piattaforma',
-      'madeWithLove': 'Fatto con ♥️ da Walid 🙂‍↕️'
+      'madeWithLove': 'Fatto con ♥️ da Walid 🙂‍↕️',
+      'youtubeDT': 'Youtube DT su iPhone'
     }
   },
   pt: {
@@ -79,7 +83,8 @@ export const resources = {
       'unableToDownload': 'Não foi possível baixar o vídeo.',
       'duration': 'Duração',
       'platform': 'Plataforma',
-      'madeWithLove': 'Feito com ♥️ por Walid 🙂‍↕️'
+      'madeWithLove': 'Feito com ♥️ por Walid 🙂‍↕️',
+      'youtubeDT': 'Youtube DT no iPhone'
     }
   },
   ar: {
@@ -95,7 +100,8 @@ export const resources = {
       'unableToDownload': 'تعذر تنزيل الفيديو.',
       'duration': 'المدة',
       'platform': 'المنصة',
-      'madeWithLove': 'صنع بـ ♥️ بواسطة وليد 🙂‍↕️'
+      'madeWithLove': 'صنع بـ ♥️ بواسطة وليد 🙂‍↕️',
+      'youtubeDT': 'يوتيوب DT على آيفون'
     }
   }
 };
@@ -104,7 +110,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'fr', // default language
+    lng: 'fr',
     interpolation: {
       escapeValue: false
     }
