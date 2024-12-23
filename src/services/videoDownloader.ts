@@ -28,6 +28,7 @@ export const videoDownloader = {
   async downloadVideo(url: string): Promise<void> {
     try {
       let downloadUrl = '';
+      let filename = `video_${Date.now()}.mp4`;
       
       if (url.includes('youtube.com') || url.includes('youtu.be')) {
         downloadUrl = await youtubeApi.downloadVideo(url);
@@ -41,14 +42,18 @@ export const videoDownloader = {
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
-      const downloadElement = document.createElement('a');
-      downloadElement.href = downloadUrl;
-      downloadElement.download = `video_${Date.now()}.mp4`;
-      downloadElement.target = '_blank';
+      // Télécharger directement le fichier
+      const response = await fetch(downloadUrl);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
       
+      const downloadElement = document.createElement('a');
+      downloadElement.href = blobUrl;
+      downloadElement.download = filename;
       document.body.appendChild(downloadElement);
       downloadElement.click();
       document.body.removeChild(downloadElement);
+      window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
       console.error('Error downloading video:', error);
       throw error;
