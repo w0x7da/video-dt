@@ -3,7 +3,11 @@ const BASE_URL = "https://youtube-to-mp4.p.rapidapi.com";
 
 export const youtubeApi = {
   async getVideoInfo(url: string) {
-    const apiUrl = `${BASE_URL}/url=&title?url=${encodeURIComponent(url)}`;
+    const params = new URLSearchParams({
+      url: url
+    });
+    const apiUrl = `${BASE_URL}/url?${params.toString()}`;
+    
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
@@ -26,7 +30,11 @@ export const youtubeApi = {
   },
 
   async downloadVideo(url: string) {
-    const apiUrl = `${BASE_URL}/url=&title?url=${encodeURIComponent(url)}`;
+    const params = new URLSearchParams({
+      url: url
+    });
+    const apiUrl = `${BASE_URL}/url?${params.toString()}`;
+    
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
