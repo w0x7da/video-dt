@@ -8,7 +8,7 @@ export const AppleShortcut = () => {
   return (
     <div className="mt-16 flex flex-col items-center gap-6 w-full max-w-md mx-auto px-4">
       <a 
-        href="https://www.icloud.com/shortcuts/e15b5336eba049e6a220f23e0900005e"
+        href="https://www.icloud.com/shortcuts/e2f959a437544128b4942eddcbbb23be"
         target="_blank"
         rel="noopener noreferrer"
         className="w-full flex justify-center"
