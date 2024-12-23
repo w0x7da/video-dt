@@ -2,6 +2,7 @@ const API_KEY = "6079|kQr3TNBAD4pT2xWNP1TBP0pNZVbM3zzeSmEw3YtN";
 const BASE_URL_INSTAGRAM = "https://zylalabs.com/api/2883/instagram+photo+and+video+saver+api/3005";
 const BASE_URL_UNIVERSAL = "https://zylalabs.com/api/5393/universal+social+downloader+api/6986";
 const BASE_URL_TWITTER = "https://zylalabs.com/api/4148/twitter+video+download+api/6143";
+const BASE_URL_YOUTUBE = "https://zylalabs.com/api/2196/youtube+video+downloader+api/2226";
 
 interface VideoInfo {
   title: string;
@@ -33,6 +34,9 @@ export const videoDownloader = {
         apiUrl = `${BASE_URL_INSTAGRAM}/content+downloader?url=${encodeURIComponent(url)}`;
       } else if (url.includes('twitter.com') || url.includes('x.com')) {
         apiUrl = `${BASE_URL_TWITTER}/get+video`;
+        method = 'POST';
+      } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+        apiUrl = `${BASE_URL_YOUTUBE}/download`;
         method = 'POST';
       } else {
         apiUrl = `${BASE_URL_UNIVERSAL}/download+social+media+content`;
@@ -104,6 +108,9 @@ export const videoDownloader = {
       } else if (url.includes('twitter.com') || url.includes('x.com')) {
         apiUrl = `${BASE_URL_TWITTER}/get+video`;
         method = 'POST';
+      } else if (url.includes('youtube.com') || url.includes('youtu.be')) {
+        apiUrl = `${BASE_URL_YOUTUBE}/download`;
+        method = 'POST';
       } else {
         apiUrl = `${BASE_URL_UNIVERSAL}/download+social+media+content`;
         method = 'POST';
@@ -126,9 +133,23 @@ export const videoDownloader = {
       
       // Chercher la meilleure qualité disponible dans la réponse de l'API
       if (data.medias && Array.isArray(data.medias)) {
-        const videoMedia = data.medias.find((m: Media) => m.type === 'video');
-        if (videoMedia) {
-          downloadUrl = videoMedia.url;
+        // Pour YouTube, on cherche la meilleure qualité disponible
+        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+          const qualities = ['1080p', '720p', '480p', '360p', '240p', '144p'];
+          for (const quality of qualities) {
+            const media = data.medias.find((m: Media) => 
+              m.quality === quality && m.type === 'video'
+            );
+            if (media) {
+              downloadUrl = media.url;
+              break;
+            }
+          }
+        } else {
+          const videoMedia = data.medias.find((m: Media) => m.type === 'video');
+          if (videoMedia) {
+            downloadUrl = videoMedia.url;
+          }
         }
       }
 
