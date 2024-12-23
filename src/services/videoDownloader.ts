@@ -1,7 +1,6 @@
 const API_KEY = "6079|kQr3TNBAD4pT2xWNP1TBP0pNZVbM3zzeSmEw3YtN";
 const BASE_URL_INSTAGRAM = "https://zylalabs.com/api/2883/instagram+photo+and+video+saver+api/3005";
 const BASE_URL_UNIVERSAL = "https://zylalabs.com/api/5393/universal+social+downloader+api/6986";
-const BASE_URL_TWITTER = "https://zylalabs.com/api/4148/twitter+video+download+api/6143";
 
 interface VideoInfo {
   title: string;
@@ -24,16 +23,12 @@ export const videoDownloader = {
       let method = 'GET';
       const headers = {
         'Authorization': `Bearer ${API_KEY}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Accept': 'application/json'
       };
       
       // Déterminer quelle API utiliser en fonction de l'URL
       if (url.includes('instagram.com')) {
         apiUrl = `${BASE_URL_INSTAGRAM}/content+downloader?url=${encodeURIComponent(url)}`;
-      } else if (url.includes('twitter.com') || url.includes('x.com')) {
-        apiUrl = `${BASE_URL_TWITTER}/get+video`;
-        method = 'POST';
       } else {
         apiUrl = `${BASE_URL_UNIVERSAL}/download+social+media+content`;
         method = 'POST';
@@ -94,16 +89,12 @@ export const videoDownloader = {
       let method = 'GET';
       const headers = {
         'Authorization': `Bearer ${API_KEY}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Accept': 'application/json'
       };
       
       // Déterminer quelle API utiliser en fonction de l'URL
       if (url.includes('instagram.com')) {
         apiUrl = `${BASE_URL_INSTAGRAM}/content+downloader?url=${encodeURIComponent(url)}`;
-      } else if (url.includes('twitter.com') || url.includes('x.com')) {
-        apiUrl = `${BASE_URL_TWITTER}/get+video`;
-        method = 'POST';
       } else {
         apiUrl = `${BASE_URL_UNIVERSAL}/download+social+media+content`;
         method = 'POST';
@@ -124,18 +115,19 @@ export const videoDownloader = {
       
       let downloadUrl = '';
       
-      // Chercher la meilleure qualité disponible
+      // Chercher la meilleure qualité sans filigrane selon la plateforme
       if (data.medias && Array.isArray(data.medias)) {
-        // Trier les médias par qualité (supposant que la qualité est un nombre dans la chaîne)
-        const sortedMedias = data.medias.sort((a: Media, b: Media) => {
-          const qualityA = parseInt(a.quality.match(/\d+/)?.[0] || '0');
-          const qualityB = parseInt(b.quality.match(/\d+/)?.[0] || '0');
-          return qualityB - qualityA;
-        });
+        const qualities = ['hd_no_watermark', 'no_watermark', 'hd', 'high', 'sd', 'watermark'];
         
-        // Prendre la première URL (meilleure qualité)
-        if (sortedMedias.length > 0) {
-          downloadUrl = sortedMedias[0].url;
+        for (const quality of qualities) {
+          const media = data.medias.find((m: Media) => 
+            (m.quality === quality || m.quality?.toLowerCase().includes(quality)) && 
+            m.type === 'video'
+          );
+          if (media) {
+            downloadUrl = media.url;
+            break;
+          }
         }
       }
 
@@ -154,9 +146,13 @@ export const videoDownloader = {
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
+      // Télécharger la vidéo
+      const videoResponse = await fetch(downloadUrl);
+      const blob = await videoResponse.blob();
+      
       // Créer un lien de téléchargement temporaire
       const downloadElement = document.createElement('a');
-      downloadElement.href = downloadUrl;
+      downloadElement.href = URL.createObjectURL(blob);
       
       // Générer un nom de fichier basé sur la plateforme
       const platform = url.includes('instagram.com') ? 'instagram' :
@@ -171,6 +167,9 @@ export const videoDownloader = {
       document.body.appendChild(downloadElement);
       downloadElement.click();
       document.body.removeChild(downloadElement);
+      
+      // Nettoyer l'URL temporaire
+      URL.revokeObjectURL(downloadElement.href);
     } catch (error) {
       console.error('Error downloading video:', error);
       throw error;
