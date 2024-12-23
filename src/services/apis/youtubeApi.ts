@@ -1,5 +1,5 @@
 const RAPID_API_KEY = "9aed925b29msh2aa707be2332276p12fd68jsncf8eccea39b7";
-const BASE_URL = "https://youtube-to-mp4.p.rapidapi.com/url";
+const BASE_URL = "https://youtube-to-mp4.p.rapidapi.com/url=&title";
 
 export const youtubeApi = {
   async getVideoInfo(url: string) {
