@@ -17,6 +17,8 @@ export const Header = () => {
     en: { name: 'English', flag: '🇬🇧' },
     fr: { name: 'Français', flag: '🇫🇷' },
     es: { name: 'Español', flag: '🇪🇸' },
+    it: { name: 'Italiano', flag: '🇮🇹' },
+    pt: { name: 'Português', flag: '🇵🇹' },
     ar: { name: 'العربية', flag: '🇸🇦' }
   };
 

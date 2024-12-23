@@ -6,7 +6,7 @@ export const AppleShortcut = () => {
   const { t } = useTranslation();
   
   return (
-    <div className="mt-12 flex flex-col items-center gap-3 w-full max-w-md mx-auto px-4">
+    <div className="mt-16 flex flex-col items-center gap-4 w-full max-w-md mx-auto px-4">
       <a 
         href="https://www.icloud.com/shortcuts/e2f959a437544128b4942eddcbbb23be"
         target="_blank"

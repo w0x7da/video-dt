@@ -77,6 +77,9 @@ export const VideoDownloader = () => {
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
               {t('videoDownloader')}
             </h1>
+            <p className="text-muted-foreground">
+              {t('madeWithLove')}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -128,7 +131,9 @@ export const VideoDownloader = () => {
             </div>
           )}
           
-          <AppleShortcut />
+          <div className="mt-8">
+            <AppleShortcut />
+          </div>
         </div>
       </div>
     </div>

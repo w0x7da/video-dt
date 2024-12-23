@@ -15,6 +15,7 @@ export const resources = {
       'unableToDownload': 'Unable to download the video.',
       'duration': 'Duration',
       'platform': 'Platform',
+      'madeWithLove': 'Made with ♥️ by Walid 🙂‍↕️'
     }
   },
   fr: {
@@ -30,6 +31,7 @@ export const resources = {
       'unableToDownload': 'Impossible de télécharger la vidéo.',
       'duration': 'Durée',
       'platform': 'Plateforme',
+      'madeWithLove': 'Fait avec ♥️ par Walid 🙂‍↕️'
     }
   },
   es: {
@@ -45,6 +47,39 @@ export const resources = {
       'unableToDownload': 'No se pudo descargar el video.',
       'duration': 'Duración',
       'platform': 'Plataforma',
+      'madeWithLove': 'Hecho con ♥️ por Walid 🙂‍↕️'
+    }
+  },
+  it: {
+    translation: {
+      'getOne': 'Ottieni su',
+      'videoDownloader': 'Scaricatore di Video',
+      'pasteUrl': 'Incolla URL',
+      'check': 'Verifica',
+      'error': 'Errore',
+      'invalidUrl': 'URL non valido',
+      'unableToFetch': 'Impossibile recuperare le informazioni del video.',
+      'downloadStarted': 'Il download è iniziato.',
+      'unableToDownload': 'Impossibile scaricare il video.',
+      'duration': 'Durata',
+      'platform': 'Piattaforma',
+      'madeWithLove': 'Fatto con ♥️ da Walid 🙂‍↕️'
+    }
+  },
+  pt: {
+    translation: {
+      'getOne': 'Obter no',
+      'videoDownloader': 'Baixador de Vídeos',
+      'pasteUrl': 'Colar URL',
+      'check': 'Verificar',
+      'error': 'Erro',
+      'invalidUrl': 'URL inválido',
+      'unableToFetch': 'Não foi possível obter as informações do vídeo.',
+      'downloadStarted': 'O download começou.',
+      'unableToDownload': 'Não foi possível baixar o vídeo.',
+      'duration': 'Duração',
+      'platform': 'Plataforma',
+      'madeWithLove': 'Feito com ♥️ por Walid 🙂‍↕️'
     }
   },
   ar: {
@@ -60,6 +95,7 @@ export const resources = {
       'unableToDownload': 'تعذر تنزيل الفيديو.',
       'duration': 'المدة',
       'platform': 'المنصة',
+      'madeWithLove': 'صنع بـ ♥️ بواسطة وليد 🙂‍↕️'
     }
   }
 };
