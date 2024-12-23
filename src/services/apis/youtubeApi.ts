@@ -1,5 +1,5 @@
 const RAPID_API_KEY = "9aed925b29msh2aa707be2332276p12fd68jsncf8eccea39b7";
-const BASE_URL = "https://cloud-api-hub-youtube-downloader.p.rapidapi.com/download";
+const BASE_URL = "https://super-fast-youtube-to-mp3-and-mp4-converter.p.rapidapi.com";
 
 const MAX_RETRIES = 3;
 const TIMEOUT = 30000; // 30 secondes
@@ -58,10 +58,10 @@ export const youtubeApi = {
         throw new Error('ID de vidéo YouTube invalide');
       }
 
-      const response = await fetchWithRetry(`${BASE_URL}?id=${videoId}&filter=video&quality=highest`, {
+      const response = await fetchWithRetry(`${BASE_URL}?url=https://www.youtube.com/watch?v=${videoId}`, {
         method: 'GET',
         headers: {
-          'x-rapidapi-host': 'cloud-api-hub-youtube-downloader.p.rapidapi.com',
+          'x-rapidapi-host': 'super-fast-youtube-to-mp3-and-mp4-converter.p.rapidapi.com',
           'x-rapidapi-key': RAPID_API_KEY
         }
       });
@@ -90,10 +90,10 @@ export const youtubeApi = {
         throw new Error('ID de vidéo YouTube invalide');
       }
 
-      const response = await fetchWithRetry(`${BASE_URL}?id=${videoId}&filter=video&quality=highest`, {
+      const response = await fetchWithRetry(`${BASE_URL}?url=https://www.youtube.com/watch?v=${videoId}`, {
         method: 'GET',
         headers: {
-          'x-rapidapi-host': 'cloud-api-hub-youtube-downloader.p.rapidapi.com',
+          'x-rapidapi-host': 'super-fast-youtube-to-mp3-and-mp4-converter.p.rapidapi.com',
           'x-rapidapi-key': RAPID_API_KEY
         }
       });
@@ -101,7 +101,8 @@ export const youtubeApi = {
       const data = await response.json();
       console.log('Download API Response data:', data);
 
-      const downloadUrl = data?.url;
+      // On prend le format MP4 avec la meilleure qualité disponible
+      const downloadUrl = data?.formats?.find((format: any) => format.ext === 'mp4')?.url;
       
       if (!downloadUrl) {
         throw new Error('Aucun lien de téléchargement disponible');
