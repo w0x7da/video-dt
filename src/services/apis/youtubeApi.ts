@@ -1,5 +1,5 @@
 const RAPID_API_KEY = "9aed925b29msh2aa707be2332276p12fd68jsncf8eccea39b7";
-const BASE_URL = "https://fast-tubedown-videos-api.p.rapidapi.com";
+const BASE_URL = "https://youtube-shorts-video-downloader-and-converter.p.rapidapi.com";
 
 const MAX_RETRIES = 3;
 const TIMEOUT = 30000; // 30 secondes
@@ -52,11 +52,16 @@ export const youtubeApi = {
   async getVideoInfo(url: string) {
     try {
       console.log('Fetching video info for URL:', url);
+      
+      const videoId = extractYoutubeId(url);
+      if (!videoId) {
+        throw new Error('ID de vidéo YouTube invalide');
+      }
 
-      const response = await fetchWithRetry(`${BASE_URL}/?vid=${encodeURIComponent(url)}`, {
+      const response = await fetchWithRetry(`${BASE_URL}/get-video-info/${videoId}`, {
         method: 'GET',
         headers: {
-          'x-rapidapi-host': 'fast-tubedown-videos-api.p.rapidapi.com',
+          'x-rapidapi-host': 'youtube-shorts-video-downloader-and-converter.p.rapidapi.com',
           'x-rapidapi-key': RAPID_API_KEY
         }
       });
@@ -70,7 +75,7 @@ export const youtubeApi = {
 
       return {
         title: data.title || 'Vidéo YouTube',
-        thumbnail: data.thumb || '',
+        thumbnail: data.thumbnail || '',
         duration: formatDuration(data.duration) || '00:00',
         platform: 'YouTube'
       };
@@ -83,11 +88,16 @@ export const youtubeApi = {
   async downloadVideo(url: string) {
     try {
       console.log('Downloading video for URL:', url);
+      
+      const videoId = extractYoutubeId(url);
+      if (!videoId) {
+        throw new Error('ID de vidéo YouTube invalide');
+      }
 
-      const response = await fetchWithRetry(`${BASE_URL}/?vid=${encodeURIComponent(url)}`, {
+      const response = await fetchWithRetry(`${BASE_URL}/download-short-mp4/${videoId}?quality=480p`, {
         method: 'GET',
         headers: {
-          'x-rapidapi-host': 'fast-tubedown-videos-api.p.rapidapi.com',
+          'x-rapidapi-host': 'youtube-shorts-video-downloader-and-converter.p.rapidapi.com',
           'x-rapidapi-key': RAPID_API_KEY
         }
       });
@@ -95,18 +105,11 @@ export const youtubeApi = {
       const data = await response.json();
       console.log('Download API Response:', data);
 
-      if (!data || !data.links || data.links.length === 0) {
+      if (!data || !data.url) {
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
-      // Prendre le lien de meilleure qualité
-      const bestQualityLink = data.links.reduce((prev: any, current: any) => {
-        const prevQuality = parseInt(prev.quality) || 0;
-        const currentQuality = parseInt(current.quality) || 0;
-        return currentQuality > prevQuality ? current : prev;
-      });
-
-      return bestQualityLink.url;
+      return data.url;
     } catch (error) {
       console.error('Error in downloadVideo:', error);
       throw error;
