@@ -1,22 +1,17 @@
 const RAPID_API_KEY = "9aed925b29msh2aa707be2332276p12fd68jsncf8eccea39b7";
-const BASE_URL = "https://youtube-media-downloader.p.rapidapi.com/v2/misc/list-items";
+const BASE_URL = "https://youtube-media-downloader.p.rapidapi.com/v2/video/subtitles";
 
 export const youtubeApi = {
   async getVideoInfo(url: string) {
     try {
       console.log('Fetching video info for URL:', url);
       
-      const response = await fetch(BASE_URL, {
-        method: 'POST',
+      const response = await fetch(`${BASE_URL}?format=xml`, {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
           'x-rapidapi-host': 'youtube-media-downloader.p.rapidapi.com',
           'x-rapidapi-key': RAPID_API_KEY
-        },
-        body: new URLSearchParams({
-          url: url,
-          nextToken: '' // Ajout du paramètre requis
-        })
+        }
       });
 
       if (!response.ok) {
@@ -28,11 +23,10 @@ export const youtubeApi = {
       console.log('API Response data:', data);
 
       // Extraction des informations pertinentes de la réponse
-      const videoData = data.items[0];
       return {
-        title: videoData?.title || 'Vidéo YouTube',
-        thumbnail: videoData?.thumbnail?.url || '',
-        duration: videoData?.duration || '00:00',
+        title: data?.title || 'Vidéo YouTube',
+        thumbnail: data?.thumbnail?.url || '',
+        duration: data?.duration || '00:00',
         platform: 'YouTube'
       };
     } catch (error) {
@@ -45,17 +39,12 @@ export const youtubeApi = {
     try {
       console.log('Downloading video for URL:', url);
       
-      const response = await fetch(BASE_URL, {
-        method: 'POST',
+      const response = await fetch(`${BASE_URL}?format=xml`, {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
           'x-rapidapi-host': 'youtube-media-downloader.p.rapidapi.com',
           'x-rapidapi-key': RAPID_API_KEY
-        },
-        body: new URLSearchParams({
-          url: url,
-          nextToken: '' // Ajout du paramètre requis
-        })
+        }
       });
 
       if (!response.ok) {
@@ -66,9 +55,8 @@ export const youtubeApi = {
       const data = await response.json();
       console.log('Download API Response data:', data);
 
-      // Récupération du lien de téléchargement de la meilleure qualité disponible
-      const downloadUrl = data.items[0]?.formats?.find((f: any) => f.quality === 'high')?.url || 
-                         data.items[0]?.formats?.[0]?.url;
+      // Récupération du lien de téléchargement
+      const downloadUrl = data?.url;
       
       if (!downloadUrl) {
         throw new Error('Aucun lien de téléchargement disponible');
