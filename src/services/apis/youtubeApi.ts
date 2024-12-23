@@ -1,20 +1,21 @@
 const RAPID_API_KEY = "9aed925b29msh2aa707be2332276p12fd68jsncf8eccea39b7";
-const BASE_URL = "https://youtube-to-mp4.p.rapidapi.com";
+const BASE_URL = "https://youtube-media-downloader.p.rapidapi.com/v2/misc/list-items";
 
 export const youtubeApi = {
   async getVideoInfo(url: string) {
     try {
       console.log('Fetching video info for URL:', url);
-      const encodedUrl = encodeURIComponent(url);
-      const apiUrl = `${BASE_URL}/video?url=${encodedUrl}`;
-      console.log('API URL:', apiUrl);
       
-      const response = await fetch(apiUrl, {
-        method: 'GET',
+      const response = await fetch(BASE_URL, {
+        method: 'POST',
         headers: {
-          'x-rapidapi-host': 'youtube-to-mp4.p.rapidapi.com',
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'x-rapidapi-host': 'youtube-media-downloader.p.rapidapi.com',
           'x-rapidapi-key': RAPID_API_KEY
-        }
+        },
+        body: new URLSearchParams({
+          url: url
+        })
       });
 
       if (!response.ok) {
@@ -25,10 +26,12 @@ export const youtubeApi = {
       const data = await response.json();
       console.log('API Response data:', data);
 
+      // Extraction des informations pertinentes de la réponse
+      const videoData = data.items[0];
       return {
-        title: data.title || 'Vidéo YouTube',
-        thumbnail: data.thumbnail || '',
-        duration: data.duration || '00:00',
+        title: videoData?.title || 'Vidéo YouTube',
+        thumbnail: videoData?.thumbnail?.url || '',
+        duration: videoData?.duration || '00:00',
         platform: 'YouTube'
       };
     } catch (error) {
@@ -40,16 +43,17 @@ export const youtubeApi = {
   async downloadVideo(url: string) {
     try {
       console.log('Downloading video for URL:', url);
-      const encodedUrl = encodeURIComponent(url);
-      const apiUrl = `${BASE_URL}/video?url=${encodedUrl}`;
-      console.log('Download API URL:', apiUrl);
-
-      const response = await fetch(apiUrl, {
-        method: 'GET',
+      
+      const response = await fetch(BASE_URL, {
+        method: 'POST',
         headers: {
-          'x-rapidapi-host': 'youtube-to-mp4.p.rapidapi.com',
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'x-rapidapi-host': 'youtube-media-downloader.p.rapidapi.com',
           'x-rapidapi-key': RAPID_API_KEY
-        }
+        },
+        body: new URLSearchParams({
+          url: url
+        })
       });
 
       if (!response.ok) {
@@ -59,7 +63,16 @@ export const youtubeApi = {
 
       const data = await response.json();
       console.log('Download API Response data:', data);
-      return data.url || '';
+
+      // Récupération du lien de téléchargement de la meilleure qualité disponible
+      const downloadUrl = data.items[0]?.formats?.find((f: any) => f.quality === 'high')?.url || 
+                         data.items[0]?.formats?.[0]?.url;
+      
+      if (!downloadUrl) {
+        throw new Error('Aucun lien de téléchargement disponible');
+      }
+
+      return downloadUrl;
     } catch (error) {
       console.error('Error in downloadVideo:', error);
       throw error;
