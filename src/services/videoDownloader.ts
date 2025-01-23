@@ -1,5 +1,5 @@
 const YT_DLP_API = "https://api.dlpanda.com/v1";
-const API_KEY = "dp_Z5qYWE9876XyPkL2mN4Jt"; // Updated API key
+const API_KEY = "dp_Z5qYWE9876XyPkL2mN4Jt";
 
 interface VideoInfo {
   title: string;
@@ -29,17 +29,13 @@ export const videoDownloader = {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'X-API-Key': API_KEY,
-          'Origin': window.location.origin,
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+          'Origin': window.location.origin
         },
         body: JSON.stringify({ 
           url: url,
           platform: detectPlatform(url).toLowerCase(),
           quality: 'best',
-          format: 'mp4',
-          apikey: API_KEY
+          format: 'mp4'
         })
       });
 
@@ -89,17 +85,13 @@ export const videoDownloader = {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'X-API-Key': API_KEY,
-          'Origin': window.location.origin,
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+          'Origin': window.location.origin
         },
         body: JSON.stringify({
           url: url,
           platform: detectPlatform(url).toLowerCase(),
           format: 'mp4',
-          quality: 'best',
-          apikey: API_KEY
+          quality: 'best'
         })
       });
 
