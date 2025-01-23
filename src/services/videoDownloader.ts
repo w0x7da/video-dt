@@ -1,4 +1,4 @@
-const YT_DLP_API = "https://api.dlpanda.com/v1";
+const YT_DLP_API = "https://dlpanda.com/api/v2/video";
 const API_KEY = "dp_Z5qYWE9876XyPkL2mN4Jt";
 
 interface VideoInfo {
@@ -23,19 +23,14 @@ export const videoDownloader = {
     try {
       console.log('Fetching video info for URL:', url);
       
-      const response = await fetch(`${YT_DLP_API}/video/info`, {
+      const response = await fetch(`${YT_DLP_API}/info?key=${API_KEY}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-API-Key': API_KEY,
-          'Origin': window.location.origin
+          'Accept': 'application/json'
         },
         body: JSON.stringify({ 
-          url: url,
-          platform: detectPlatform(url).toLowerCase(),
-          quality: 'best',
-          format: 'mp4'
+          url: url
         })
       });
 
@@ -79,19 +74,15 @@ export const videoDownloader = {
     try {
       console.log('Starting video download for URL:', url);
       
-      const response = await fetch(`${YT_DLP_API}/video/download`, {
+      const response = await fetch(`${YT_DLP_API}/download?key=${API_KEY}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'X-API-Key': API_KEY,
-          'Origin': window.location.origin
+          'Accept': 'application/json'
         },
         body: JSON.stringify({
           url: url,
-          platform: detectPlatform(url).toLowerCase(),
-          format: 'mp4',
-          quality: 'best'
+          format: 'mp4'
         })
       });
 
