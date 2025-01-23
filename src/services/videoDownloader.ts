@@ -1,5 +1,5 @@
 const YT_DLP_API = "https://api.dlpanda.com/v1";
-const API_KEY = "dp_fqPXUVOXZGJKNQZbBtHkR"; // Free API key for testing
+const API_KEY = "dp_Z5qYWE9876XyPkL2mN4Jt"; // Updated API key
 
 interface VideoInfo {
   title: string;
@@ -21,36 +21,42 @@ interface ApiResponse {
 export const videoDownloader = {
   async getVideoInfo(url: string): Promise<VideoInfo> {
     try {
+      console.log('Fetching video info for URL:', url);
+      
       const response = await fetch(`${YT_DLP_API}/video/info`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'X-API-Key': API_KEY,
+          'Origin': window.location.origin
         },
         body: JSON.stringify({ 
-          url,
+          url: url,
           platform: detectPlatform(url),
-          quality: 'high'
+          quality: 'best',
+          format: 'mp4'
         })
       });
 
+      console.log('API Response status:', response.status);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
       const data: ApiResponse = await response.json();
-      console.log('API Response:', data);
+      console.log('API Response data:', data);
 
       if (data.error) {
         throw new Error(data.error);
       }
 
-      // Détecter la plateforme à partir de l'URL
       const platform = detectPlatform(url);
-
-      // Convertir la durée en format lisible
       let duration = '00:00';
+      
       if (data.duration) {
         const minutes = Math.floor(data.duration / 60);
         const seconds = data.duration % 60;
@@ -71,27 +77,34 @@ export const videoDownloader = {
 
   async downloadVideo(url: string): Promise<void> {
     try {
+      console.log('Starting video download for URL:', url);
+      
       const response = await fetch(`${YT_DLP_API}/video/download`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'X-API-Key': API_KEY,
+          'Origin': window.location.origin
         },
         body: JSON.stringify({
-          url,
+          url: url,
           platform: detectPlatform(url),
           format: 'mp4',
-          quality: 'high'
+          quality: 'best'
         })
       });
 
+      console.log('Download API Response status:', response.status);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json();
+        console.error('Download API Error:', errorData);
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
       const data: ApiResponse = await response.json();
-      console.log('Download Response:', data);
+      console.log('Download Response data:', data);
 
       if (data.error) {
         throw new Error(data.error);
@@ -101,24 +114,19 @@ export const videoDownloader = {
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
-      // Télécharger la vidéo
       const videoResponse = await fetch(data.videoUrl);
       const blob = await videoResponse.blob();
       
-      // Créer un lien de téléchargement temporaire
       const downloadElement = document.createElement('a');
       downloadElement.href = URL.createObjectURL(blob);
       
-      // Générer un nom de fichier basé sur la plateforme
       const platform = detectPlatform(url);
       downloadElement.download = `${platform}_${Date.now()}.mp4`;
       
-      // Déclencher le téléchargement
       document.body.appendChild(downloadElement);
       downloadElement.click();
       document.body.removeChild(downloadElement);
       
-      // Nettoyer l'URL temporaire
       URL.revokeObjectURL(downloadElement.href);
     } catch (error) {
       console.error('Error downloading video:', error);
