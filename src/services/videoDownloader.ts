@@ -29,13 +29,17 @@ export const videoDownloader = {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'X-API-Key': API_KEY,
-          'Origin': window.location.origin
+          'Origin': window.location.origin,
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
         },
         body: JSON.stringify({ 
           url: url,
-          platform: detectPlatform(url),
+          platform: detectPlatform(url).toLowerCase(),
           quality: 'best',
-          format: 'mp4'
+          format: 'mp4',
+          apikey: API_KEY
         })
       });
 
@@ -85,13 +89,17 @@ export const videoDownloader = {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'X-API-Key': API_KEY,
-          'Origin': window.location.origin
+          'Origin': window.location.origin,
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization'
         },
         body: JSON.stringify({
           url: url,
-          platform: detectPlatform(url),
+          platform: detectPlatform(url).toLowerCase(),
           format: 'mp4',
-          quality: 'best'
+          quality: 'best',
+          apikey: API_KEY
         })
       });
 
