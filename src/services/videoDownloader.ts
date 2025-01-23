@@ -1,4 +1,4 @@
-const COBALT_API = "https://api.cobalt.tools/v1";
+const YT_DLP_API = "https://api.ytdlp.app/api/v1";
 
 interface VideoInfo {
   title: string;
@@ -9,27 +9,22 @@ interface VideoInfo {
 
 interface ApiResponse {
   status: string;
-  text?: string;
-  url?: string;
-  thumb?: string;
+  title?: string;
+  thumbnail?: string;
   duration?: number;
+  url?: string;
+  error?: string;
 }
 
 export const videoDownloader = {
   async getVideoInfo(url: string): Promise<VideoInfo> {
     try {
-      const response = await fetch(COBALT_API, {
+      const response = await fetch(`${YT_DLP_API}/info`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          url: url,
-          aFormat: 'mp3',
-          filenamePattern: 'basic',
-          dubLang: false,
-          vQuality: '1080'
-        })
+        body: JSON.stringify({ url })
       });
 
       if (!response.ok) {
@@ -39,8 +34,8 @@ export const videoDownloader = {
       const data: ApiResponse = await response.json();
       console.log('API Response:', data);
 
-      if (data.status === 'error') {
-        throw new Error(data.text || 'Une erreur est survenue');
+      if (data.error) {
+        throw new Error(data.error);
       }
 
       // Détecter la plateforme à partir de l'URL
@@ -60,8 +55,8 @@ export const videoDownloader = {
       }
 
       return {
-        title: data.text || 'Vidéo sans titre',
-        thumbnail: data.thumb || '',
+        title: data.title || 'Vidéo sans titre',
+        thumbnail: data.thumbnail || '',
         duration,
         platform
       };
@@ -73,17 +68,14 @@ export const videoDownloader = {
 
   async downloadVideo(url: string): Promise<void> {
     try {
-      const response = await fetch(COBALT_API, {
+      const response = await fetch(`${YT_DLP_API}/download`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          url: url,
-          aFormat: 'mp3',
-          filenamePattern: 'basic',
-          dubLang: false,
-          vQuality: '1080'
+          url,
+          format: 'mp4'
         })
       });
 
@@ -94,8 +86,8 @@ export const videoDownloader = {
       const data: ApiResponse = await response.json();
       console.log('Download Response:', data);
 
-      if (data.status === 'error') {
-        throw new Error(data.text || 'Une erreur est survenue');
+      if (data.error) {
+        throw new Error(data.error);
       }
 
       if (!data.url) {
