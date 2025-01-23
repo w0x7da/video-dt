@@ -1,11 +1,14 @@
-const YT_DLP_API = "https://dlpanda.com/api/v2/video";
-const API_KEY = "dp_Z5qYWE9876XyPkL2mN4Jt";
+const API_URL = "http://localhost:5000";
 
 interface VideoInfo {
   title: string;
   thumbnail: string;
   duration: string;
   platform: string;
+  author?: string;
+  views?: number;
+  description?: string;
+  publish_date?: string;
 }
 
 interface ApiResponse {
@@ -23,15 +26,12 @@ export const videoDownloader = {
     try {
       console.log('Fetching video info for URL:', url);
       
-      const response = await fetch(`${YT_DLP_API}/info?key=${API_KEY}`, {
+      const response = await fetch(`${API_URL}/video_info`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
         },
-        body: JSON.stringify({ 
-          url: url
-        })
+        body: JSON.stringify({ url })
       });
 
       console.log('API Response status:', response.status);
@@ -42,27 +42,18 @@ export const videoDownloader = {
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
-      const data: ApiResponse = await response.json();
+      const data = await response.json();
       console.log('API Response data:', data);
 
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      const platform = detectPlatform(url);
-      let duration = '00:00';
-      
-      if (data.duration) {
-        const minutes = Math.floor(data.duration / 60);
-        const seconds = data.duration % 60;
-        duration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-      }
-
       return {
-        title: data.title || 'Vidéo sans titre',
-        thumbnail: data.thumbnail || '',
-        duration,
-        platform
+        title: data.title || 'Untitled Video',
+        thumbnail: `https://img.youtube.com/vi/${getVideoId(url)}/maxresdefault.jpg`,
+        duration: formatDuration(data.length),
+        platform: 'youtube',
+        author: data.author,
+        views: data.views,
+        description: data.description,
+        publish_date: data.publish_date
       };
     } catch (error) {
       console.error('Error fetching video info:', error);
@@ -74,16 +65,12 @@ export const videoDownloader = {
     try {
       console.log('Starting video download for URL:', url);
       
-      const response = await fetch(`${YT_DLP_API}/download?key=${API_KEY}`, {
+      const response = await fetch(`${API_URL}/download/720p`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
         },
-        body: JSON.stringify({
-          url: url,
-          format: 'mp4'
-        })
+        body: JSON.stringify({ url })
       });
 
       console.log('Download API Response status:', response.status);
@@ -94,31 +81,12 @@ export const videoDownloader = {
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
-      const data: ApiResponse = await response.json();
+      const data = await response.json();
       console.log('Download Response data:', data);
 
       if (data.error) {
         throw new Error(data.error);
       }
-
-      if (!data.videoUrl) {
-        throw new Error('Aucun lien de téléchargement disponible');
-      }
-
-      const videoResponse = await fetch(data.videoUrl);
-      const blob = await videoResponse.blob();
-      
-      const downloadElement = document.createElement('a');
-      downloadElement.href = URL.createObjectURL(blob);
-      
-      const platform = detectPlatform(url);
-      downloadElement.download = `${platform}_${Date.now()}.mp4`;
-      
-      document.body.appendChild(downloadElement);
-      downloadElement.click();
-      document.body.removeChild(downloadElement);
-      
-      URL.revokeObjectURL(downloadElement.href);
     } catch (error) {
       console.error('Error downloading video:', error);
       throw error;
@@ -126,11 +94,13 @@ export const videoDownloader = {
   }
 };
 
-function detectPlatform(url: string): string {
-  if (url.includes('instagram.com')) return 'instagram';
-  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
-  if (url.includes('tiktok.com')) return 'tiktok';
-  if (url.includes('twitter.com') || url.includes('x.com')) return 'twitter';
-  if (url.includes('facebook.com') || url.includes('fb.watch')) return 'facebook';
-  return 'unknown';
+function getVideoId(url: string): string {
+  const match = url.match(/[?&]v=([^&]+)/);
+  return match ? match[1] : '';
+}
+
+function formatDuration(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
