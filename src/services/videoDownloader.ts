@@ -1,4 +1,4 @@
-const YT_DLP_API = "https://api.ytdlp.app/api/v1";
+const YT_DLP_API = "https://api.dlpanda.com/v1";
 
 interface VideoInfo {
   title: string;
@@ -14,17 +14,22 @@ interface ApiResponse {
   duration?: number;
   url?: string;
   error?: string;
+  videoUrl?: string;
 }
 
 export const videoDownloader = {
   async getVideoInfo(url: string): Promise<VideoInfo> {
     try {
-      const response = await fetch(`${YT_DLP_API}/info`, {
+      const response = await fetch(`${YT_DLP_API}/video/info`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-        body: JSON.stringify({ url })
+        body: JSON.stringify({ 
+          url,
+          platform: detectPlatform(url)
+        })
       });
 
       if (!response.ok) {
@@ -39,12 +44,7 @@ export const videoDownloader = {
       }
 
       // Détecter la plateforme à partir de l'URL
-      let platform = 'Inconnu';
-      if (url.includes('instagram.com')) platform = 'Instagram';
-      else if (url.includes('youtube.com') || url.includes('youtu.be')) platform = 'YouTube';
-      else if (url.includes('tiktok.com')) platform = 'TikTok';
-      else if (url.includes('twitter.com') || url.includes('x.com')) platform = 'Twitter';
-      else if (url.includes('facebook.com') || url.includes('fb.watch')) platform = 'Facebook';
+      const platform = detectPlatform(url);
 
       // Convertir la durée en format lisible
       let duration = '00:00';
@@ -68,13 +68,15 @@ export const videoDownloader = {
 
   async downloadVideo(url: string): Promise<void> {
     try {
-      const response = await fetch(`${YT_DLP_API}/download`, {
+      const response = await fetch(`${YT_DLP_API}/video/download`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({
           url,
+          platform: detectPlatform(url),
           format: 'mp4'
         })
       });
@@ -90,12 +92,12 @@ export const videoDownloader = {
         throw new Error(data.error);
       }
 
-      if (!data.url) {
+      if (!data.videoUrl) {
         throw new Error('Aucun lien de téléchargement disponible');
       }
 
       // Télécharger la vidéo
-      const videoResponse = await fetch(data.url);
+      const videoResponse = await fetch(data.videoUrl);
       const blob = await videoResponse.blob();
       
       // Créer un lien de téléchargement temporaire
@@ -103,12 +105,7 @@ export const videoDownloader = {
       downloadElement.href = URL.createObjectURL(blob);
       
       // Générer un nom de fichier basé sur la plateforme
-      const platform = url.includes('instagram.com') ? 'instagram' :
-                      url.includes('youtube.com') || url.includes('youtu.be') ? 'youtube' :
-                      url.includes('tiktok.com') ? 'tiktok' :
-                      url.includes('twitter.com') || url.includes('x.com') ? 'twitter' :
-                      url.includes('facebook.com') || url.includes('fb.watch') ? 'facebook' : 'video';
-      
+      const platform = detectPlatform(url);
       downloadElement.download = `${platform}_${Date.now()}.mp4`;
       
       // Déclencher le téléchargement
@@ -124,3 +121,12 @@ export const videoDownloader = {
     }
   }
 };
+
+function detectPlatform(url: string): string {
+  if (url.includes('instagram.com')) return 'instagram';
+  if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
+  if (url.includes('tiktok.com')) return 'tiktok';
+  if (url.includes('twitter.com') || url.includes('x.com')) return 'twitter';
+  if (url.includes('facebook.com') || url.includes('fb.watch')) return 'facebook';
+  return 'unknown';
+}
