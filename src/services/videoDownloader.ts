@@ -1,4 +1,5 @@
-const API_URL = "http://localhost:5000";
+// Use environment variable or fallback to localhost for development
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 interface VideoInfo {
   title: string;
@@ -25,6 +26,7 @@ export const videoDownloader = {
   async getVideoInfo(url: string): Promise<VideoInfo> {
     try {
       console.log('Fetching video info for URL:', url);
+      console.log('Using API URL:', API_URL);
       
       const response = await fetch(`${API_URL}/video_info`, {
         method: 'POST',
