@@ -1,4 +1,5 @@
 const BASE_URL = "https://co.wuk.sh/api/json";
+const COBALT_API = "https://co.wuk.sh/api/json";
 
 interface VideoInfo {
   title: string;
@@ -18,7 +19,7 @@ interface ApiResponse {
 export const videoDownloader = {
   async getVideoInfo(url: string): Promise<VideoInfo> {
     try {
-      const response = await fetch(BASE_URL, {
+      const response = await fetch(COBALT_API, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,7 +74,7 @@ export const videoDownloader = {
 
   async downloadVideo(url: string): Promise<void> {
     try {
-      const response = await fetch(BASE_URL, {
+      const response = await fetch(COBALT_API, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
