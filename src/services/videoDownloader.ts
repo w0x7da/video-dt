@@ -1,4 +1,5 @@
 const YT_DLP_API = "https://api.dlpanda.com/v1";
+const API_KEY = "dp_fqPXUVOXZGJKNQZbBtHkR"; // Free API key for testing
 
 interface VideoInfo {
   title: string;
@@ -25,10 +26,12 @@ export const videoDownloader = {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'X-API-Key': API_KEY,
         },
         body: JSON.stringify({ 
           url,
-          platform: detectPlatform(url)
+          platform: detectPlatform(url),
+          quality: 'high'
         })
       });
 
@@ -73,11 +76,13 @@ export const videoDownloader = {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'X-API-Key': API_KEY,
         },
         body: JSON.stringify({
           url,
           platform: detectPlatform(url),
-          format: 'mp4'
+          format: 'mp4',
+          quality: 'high'
         })
       });
 
