@@ -1,5 +1,4 @@
-const BASE_URL = "https://co.wuk.sh/api/json";
-const COBALT_API = "https://co.wuk.sh/api/json";
+const COBALT_API = "https://api.cobalt.tools/v1";
 
 interface VideoInfo {
   title: string;
