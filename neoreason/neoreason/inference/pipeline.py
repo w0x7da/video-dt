@@ -115,8 +115,10 @@ class NeoReasonPipeline:
         """
         start = time.time()
 
-        # Tokenize
+        # Tokenize (truncate to max_seq_len)
         token_ids = self.tokenizer.encode(text)
+        max_len = self.reasoner.config.max_seq_len
+        token_ids = token_ids[:max_len]
         input_tokens = torch.tensor([token_ids], dtype=torch.long, device=self.device)
 
         # Reason
