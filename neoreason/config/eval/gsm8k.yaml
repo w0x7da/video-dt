@@ -1,0 +1,11 @@
+# Evaluation on GSM8K
+defaults:
+  - /model: small
+
+eval:
+  dataset: "gsm8k"
+  split: "test"
+  n_reasoning_steps: 8
+  temperature: 0.0
+  max_output_tokens: 256
+  checkpoint_dir: "checkpoints/small"

@@ -1,0 +1,10 @@
+# Phase 3: Joint fine-tuning (optional)
+defaults:
+  - /model: small
+
+training:
+  phase: "finetune"
+  reasoner_checkpoint: null
+  talker_checkpoint: null
+  reasoner_lr: 1.0e-5
+  talker_lr: 1.0e-4

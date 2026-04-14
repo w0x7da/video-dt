@@ -1,0 +1,63 @@
+model:
+  reasoner:
+    vocab_size: 32000
+    d_model: 768
+    n_heads: 12
+    n_layers: 12
+    d_ff: 3072
+    max_seq_len: 1024
+    latent_dim: 768
+    max_reasoning_steps: 16
+    dropout: 0.1
+
+  talker:
+    type: "dual"
+    d_model: 768
+    n_heads: 12
+    n_encoder_layers: 6
+    n_decoder_layers: 8
+    d_ff: 3072
+    max_seq_len: 1024
+    latent_dim: 768
+    max_reasoning_steps: 16
+    dropout: 0.1
+
+  ema:
+    momentum_initial: 0.996
+    momentum_final: 0.999
+
+  sigreg:
+    weight: 1.0
+
+training:
+  reasoner:
+    lr: 3.0e-4
+    weight_decay: 0.01
+    batch_size: 16
+    epochs: 30
+    warmup_steps: 1000
+    max_grad_norm: 1.0
+    scheduler: "cosine"
+
+  talker:
+    lr: 1.0e-4
+    weight_decay: 0.01
+    batch_size: 8
+    epochs: 20
+    warmup_steps: 500
+    max_grad_norm: 1.0
+    scheduler: "cosine"
+
+data:
+  dataset: "binary_tree"
+  tree_depth: 5
+  train_samples: 50000
+  eval_samples: 5000
+  tokenizer: "tiktoken"
+  max_seq_len: 1024
+  max_step_len: 256
+
+device: "auto"
+seed: 42
+checkpoint_dir: "checkpoints/medium"
+log_dir: "logs"

@@ -1,0 +1,7 @@
+# Phase 2: Training the Talker (Reasoner frozen)
+defaults:
+  - /model: small
+
+training:
+  phase: "talker"
+  reasoner_checkpoint: null  # Path to pretrained reasoner checkpoint

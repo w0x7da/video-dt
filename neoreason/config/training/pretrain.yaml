@@ -1,0 +1,6 @@
+# Phase 1: Pre-training the Reasoner
+defaults:
+  - /model: small
+
+training:
+  phase: "reasoner"
